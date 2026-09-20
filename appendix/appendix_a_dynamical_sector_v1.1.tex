@@ -1,0 +1,449 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{microtype}
+\emergencystretch=2em
+
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}[proposition]{Corollary}
+\theoremstyle{definition}
+\newtheorem{remark}[proposition]{Remark}
+
+\title{\textbf{Appendix A: Equilibrium and Linear-Stability Analysis of the
+Physics v1.0 Dynamical Sector}\\[0.4em]
+\large Supplementary Artifact v1.1 --- Additive to Physics v1.0}
+
+\author{
+    \textbf{Prince Upadhyay}\\
+    \small Independent Researcher\\
+    \small Email: \texttt{starxshark@gmail.com}
+}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Physics v1.0 introduces a three-variable phenomenological dynamical system and
+establishes its dimensional closure, but does not analyse it. This appendix
+supplies that analysis. We show that the system possesses a unique equilibrium
+in closed form; that the steady-state processing rate is fixed by input power
+alone and is independent of the entire entropy sector; that the equilibrium
+distance from the informational saturation parameter is set exactly by the
+irreversible-erasure rate; and that the system's only linear instability is a
+Hopf bifurcation whose threshold scales as the inverse of that same erasure
+rate, so that the system is unconditionally linearly stable in the
+zero-erasure limit. We also record two constraints absent from v1.0: an
+admissibility bound on the erasure rate, and a finite-time escape to
+unphysical states that requires an explicit domain restriction. All analytic
+results are verified numerically to machine precision.
+
+This appendix is \textbf{additive}. It introduces no new postulate, modifies no
+equation, and has no bearing on the Gate~0 verdict.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Scope and status}
+
+This document is a supplementary artifact. Under the immutability rules of the
+frozen research lineage:
+
+\begin{enumerate}
+\item Physics v1.0 remains v1.0. Nothing here edits it.
+\item No equation, coefficient, or interpretation of v1.0 is altered. The
+system analysed below is exactly equations (9)--(11) of
+\texttt{paper\_physics\_v1.0\_release.tex} as frozen.
+\item No new postulate is introduced. Every statement is a consequence of the
+frozen ansatz.
+\item Gate~0 Technical Report v1.0 and its verdict \textbf{UNRESOLVED IN
+GENERALITY} are untouched. Gate~0 audits the observer-entropy to
+horizon-entropy bridge; the present appendix analyses only the dynamical
+sector, which Gate~0 did not examine.
+\end{enumerate}
+
+\begin{remark}[$H_{\max}$ carries no geometric content here]
+\label{rem:hmax}
+Throughout this appendix $H_{\max}$ is treated strictly as the
+\emph{informational saturation parameter in bits} declared in v1.0's dynamical
+sector. Its identification with a causal-horizon capacity
+$A/(4\ell_P^2\ln 2)$ is the structural domain extension whose microphysical
+justification v1.0 leaves open and Gate~0 finds unresolved. No result below
+depends on that identification, and none of them should be read as supporting
+it.
+\end{remark}
+
+\section{The system under analysis}
+
+Write $\dot I \equiv \dot I_{\text{model}}$ and $\dot I_e \equiv
+\dot I_{\text{erase}}$. The frozen system is
+\begin{align}
+\frac{d\gamma}{dt} &= a\,\dot I\,\mathcal{E}_{\text{avail}}
+  \left(1-\frac{\gamma}{\gamma_{\max}}\right)-b\gamma,
+  \label{eq:gamma}\\[4pt]
+\frac{dH_{\text{obs}}}{dt} &= c\gamma\left(H_{\max}-H_{\text{obs}}\right)
+  -\dot I_e, \label{eq:H}\\[4pt]
+\frac{d\dot I}{dt} &= e\,\frac{dH_{\text{obs}}}{dt}
+  +f\mathcal{P}_{\text{input}}-g\dot I. \label{eq:I}
+\end{align}
+
+with the v1.0 dimensional assignments
+\begin{equation}
+[a]=[f]=\mathrm{J^{-1}s^{-1}},\qquad
+[b]=[e]=[g]=\mathrm{s^{-1}},\qquad
+[c]=1 .
+\end{equation}
+
+We treat $\mathcal{E}_{\text{avail}}$, $\mathcal{P}_{\text{input}}$ and
+$\dot I_e$ as constant control parameters, and all coefficients
+$a,b,c,e,f,g,\gamma_{\max},H_{\max}$ as positive. It is convenient to
+introduce the \emph{informational gap}
+\begin{equation}
+D \equiv H_{\max}-H_{\text{obs}},
+\end{equation}
+in terms of which \eqref{eq:H} reads $\dot D = -c\gamma D+\dot I_e$.
+
+\section{Equilibrium structure}
+
+\begin{proposition}[Unique equilibrium in closed form]
+\label{prop:fp}
+For $\dot I_e>0$ the system \eqref{eq:gamma}--\eqref{eq:I} admits exactly one
+equilibrium, given by
+\begin{equation}
+\boxed{\;
+\dot I^{*}=\frac{f\mathcal{P}_{\text{input}}}{g},\qquad
+\gamma^{*}=\frac{K\gamma_{\max}}{b\gamma_{\max}+K},\qquad
+H^{*}_{\text{obs}}=H_{\max}-\frac{\dot I_e}{c\,\gamma^{*}},\;}
+\label{eq:fp}
+\end{equation}
+where $K\equiv a\,\mathcal{E}_{\text{avail}}\dot I^{*}$. Moreover
+$0<\gamma^{*}<\gamma_{\max}$.
+\end{proposition}
+
+\begin{proof}
+At equilibrium $dH_{\text{obs}}/dt=0$, so the first term of \eqref{eq:I}
+vanishes identically and \eqref{eq:I} reduces to
+$f\mathcal{P}_{\text{input}}-g\dot I^{*}=0$, giving $\dot I^{*}$ as stated.
+Substituting into \eqref{eq:gamma} with $d\gamma/dt=0$,
+\begin{equation}
+K\left(1-\frac{\gamma^{*}}{\gamma_{\max}}\right)=b\gamma^{*}
+\;\Longrightarrow\;
+K=\gamma^{*}\!\left(b+\frac{K}{\gamma_{\max}}\right)
+\;\Longrightarrow\;
+\gamma^{*}=\frac{K\gamma_{\max}}{b\gamma_{\max}+K},
+\end{equation}
+which is a single root, positive, and strictly below $\gamma_{\max}$ for
+finite $K$. Finally $dH_{\text{obs}}/dt=0$ gives
+$c\gamma^{*}D^{*}=\dot I_e$, hence $D^{*}=\dot I_e/(c\gamma^{*})$ and
+$H^{*}_{\text{obs}}=H_{\max}-D^{*}$.
+\end{proof}
+
+\begin{corollary}[The entropy sector does not set the processing rate]
+\label{cor:decouple}
+$\dot I^{*}$ depends only on $f$, $\mathcal{P}_{\text{input}}$ and $g$. It is
+independent of $a,b,c,e,\gamma_{\max},H_{\max}$ and $\dot I_e$.
+\end{corollary}
+
+\begin{remark}[Why no ignition threshold exists]
+The three equations form a closed cycle: $\dot I$ drives $\gamma$ through
+\eqref{eq:gamma}, $\gamma$ drives $H_{\text{obs}}$ through \eqref{eq:H}, and
+$H_{\text{obs}}$ feeds back into $\dot I$ through \eqref{eq:I}. One might
+therefore expect a loop-gain condition separating a quiescent branch from a
+self-sustaining branch, i.e.\ bistability with an ignition threshold. No such
+structure is present. The reason is that the return path in \eqref{eq:I}
+couples to $dH_{\text{obs}}/dt$ rather than to $H_{\text{obs}}$: a derivative
+coupling, which vanishes identically at any steady state. The loop is
+therefore open at equilibrium and closed only in the transient regime. This is
+a structural feature of the ansatz as written, not an artifact of parameter
+choice.
+\end{remark}
+
+\section{Admissibility constraints}
+
+Proposition~\ref{prop:fp} yields two constraints not stated in v1.0.
+
+\begin{proposition}[Erasure sets the equilibrium gap]
+\label{prop:gap}
+At equilibrium,
+\begin{equation}
+H_{\max}-H^{*}_{\text{obs}}=\frac{\dot I_e}{c\,\gamma^{*}} .
+\end{equation}
+Consequently the v1.0 boundary condition $H_{\text{obs}}\le H_{\max}$ is
+satisfied with strict inequality whenever $\dot I_e>0$, and is saturated
+exactly, $H^{*}_{\text{obs}}=H_{\max}$, in the limit $\dot I_e\to 0$.
+\end{proposition}
+
+Within the ansatz, irreversible erasure is therefore the sole mechanism holding
+the equilibrium state below the saturation parameter, and the equilibrium
+distance from saturation is inversely proportional to the relaxation rate
+$\gamma^{*}$. Under Remark~\ref{rem:hmax} this is a statement about the model's
+internal bookkeeping and carries no horizon interpretation.
+
+\begin{proposition}[Admissibility bound on the erasure rate]
+\label{prop:admiss}
+Since $H_{\text{obs}}$ is a von Neumann entropy in bits, $H_{\text{obs}}\ge 0$
+is required. The equilibrium \eqref{eq:fp} is physically admissible only if
+\begin{equation}
+\boxed{\;\dot I_e\;\le\;c\,\gamma^{*}H_{\max}\;}
+\end{equation}
+Erasure rates above this bound drive the equilibrium value of
+$H_{\text{obs}}$ negative and place the model outside its own domain of
+interpretation.
+\end{proposition}
+
+\section{Linear stability}
+
+\subsection{Jacobian and two identities}
+
+Linearising \eqref{eq:gamma}--\eqref{eq:I} about \eqref{eq:fp} in the
+coordinates $(\gamma,D,\dot I)$ and writing
+\begin{equation}
+\alpha\equiv\frac{a\mathcal{E}_{\text{avail}}\dot I^{*}}{\gamma_{\max}}+b,
+\qquad
+\beta\equiv a\mathcal{E}_{\text{avail}}\!\left(1-\frac{\gamma^{*}}{\gamma_{\max}}\right),
+\qquad
+\mu\equiv c\gamma^{*},
+\qquad
+\delta\equiv cD^{*},
+\end{equation}
+all strictly positive, the Jacobian is
+\begin{equation}
+J=\begin{pmatrix}
+-\alpha & 0 & \beta\\
+-\delta & -\mu & 0\\
+e\delta & e\mu & -g
+\end{pmatrix}.
+\label{eq:jac}
+\end{equation}
+
+Two exact identities simplify everything that follows:
+\begin{equation}
+\boxed{\;\alpha\beta=a\,\mathcal{E}_{\text{avail}}\,b,
+\qquad
+\mu\delta=c\,\dot I_e\;}
+\label{eq:ident}
+\end{equation}
+The first follows from
+$\alpha=(K+b\gamma_{\max})/\gamma_{\max}$ and
+$\beta=a\mathcal{E}_{\text{avail}}b\gamma_{\max}/(b\gamma_{\max}+K)$; the
+second from $\delta=cD^{*}=\dot I_e/\gamma^{*}$ and $\mu=c\gamma^{*}$.
+
+Note that $\alpha$, $\beta$ and $\mu$ depend on $\dot I_e$ not at all: by
+Proposition~\ref{prop:fp}, neither $\dot I^{*}$ nor $\gamma^{*}$ involves
+$\dot I_e$. The erasure rate enters the linearisation through $\delta$ alone,
+and does so linearly. This observation drives Proposition~\ref{prop:scaling}
+below.
+
+\subsection{Characteristic polynomial}
+
+Expanding $\det(J-\lambda I)$ from \eqref{eq:jac}, the off-diagonal
+structure causes the $\mu$-dependent contributions of the third row to cancel
+against one another, leaving
+\begin{equation}
+(\alpha+\lambda)(\mu+\lambda)(g+\lambda)=\beta e\delta\,\lambda,
+\end{equation}
+that is
+\begin{equation}
+\lambda^{3}
++\underbrace{(\alpha+\mu+g)}_{a_2}\lambda^{2}
++\underbrace{(\alpha\mu+\alpha g+\mu g-e\beta\delta)}_{a_1}\lambda
++\underbrace{\alpha\mu g}_{a_0}=0 .
+\label{eq:cubic}
+\end{equation}
+
+\subsection{The Hopf threshold}
+
+\begin{proposition}[Single stability boundary]
+\label{prop:hopf}
+The equilibrium \eqref{eq:fp} is linearly asymptotically stable if and only if
+$e<e_c$, where
+\begin{equation}
+\boxed{\;
+e_c=\frac{(\alpha+\mu+g)(\alpha\mu+\alpha g+\mu g)-\alpha\mu g}
+{\beta\delta\,(\alpha+\mu+g)}\;}
+\label{eq:ecrit}
+\end{equation}
+At $e=e_c$ a complex-conjugate pair crosses the imaginary axis at frequency
+\begin{equation}
+\omega_c=\sqrt{\frac{\alpha\mu g}{\alpha+\mu+g}} .
+\label{eq:omega}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+For the cubic \eqref{eq:cubic} the Routh--Hurwitz criterion requires
+$a_2>0$, $a_0>0$ and $a_2a_1>a_0$. The first two hold identically since
+$\alpha,\mu,g>0$. The third,
+$(\alpha+\mu+g)(\alpha\mu+\alpha g+\mu g-e\beta\delta)>\alpha\mu g$, is linear
+and strictly decreasing in $e$ because $\beta,\delta>0$; solving for equality
+gives \eqref{eq:ecrit}. At equality $a_1=a_0/a_2$, so \eqref{eq:cubic}
+factorises as $(\lambda+a_2)(\lambda^{2}+a_0/a_2)=0$, giving a real root
+$-a_2$ and a pair $\pm i\sqrt{a_0/a_2}$, which is \eqref{eq:omega}. Since only
+$a_1$ depends on $e$ and does so monotonically, the crossing is unique and
+transversal.
+\end{proof}
+
+\begin{corollary}[Zero-erasure limit is unconditionally stable]
+\label{prop:scaling}
+Because $\alpha,\beta,\mu$ are independent of $\dot I_e$ and
+$\delta=\dot I_e/\gamma^{*}$, the product $e_c\dot I_e$ is invariant under
+changes of $\dot I_e$:
+\begin{equation}
+e_c\;\propto\;\frac{1}{\dot I_e},
+\qquad\text{equivalently}\qquad
+e_c=\frac{\alpha\mu\left[(\alpha+\mu+g)(\alpha\mu+\alpha g+\mu g)-\alpha\mu g\right]}
+{a\,\mathcal{E}_{\text{avail}}\,b\,c\,\dot I_e\,(\alpha+\mu+g)} ,
+\end{equation}
+using \eqref{eq:ident}. Hence $e_c\to\infty$ as $\dot I_e\to 0$: in the
+zero-erasure limit the equilibrium is linearly stable for every finite
+feedback gain $e$, and the Hopf frequency \eqref{eq:omega} is unchanged.
+\end{corollary}
+
+\begin{remark}[Interpretation, stated narrowly]
+Within this ansatz the only linear instability available to the system is
+driven by the irreversible-erasure channel. This is of interest because v1.0
+explicitly declines to specify any relation between $\dot I_{\text{model}}$ and
+$\dot I_{\text{erase}}$ and records that omission as an open problem. The
+present result sharpens what is at stake in that omission: the unspecified
+relation controls not merely a dissipative cost but the existence of
+oscillatory dynamics. It does not supply the missing relation, and no relation
+should be inferred from it.
+\end{remark}
+
+\section{Numerical verification}
+
+All results were checked against direct numerical evaluation using the
+benchmark parameter set
+$a=b=c=f=g=\mathcal{E}_{\text{avail}}=1$,
+$\gamma_{\max}=10$, $H_{\max}=100$, $\mathcal{P}_{\text{input}}=5$,
+in the units of v1.0.
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{Xccc}
+\toprule
+\textbf{Quantity} & $\dot I_e=1$ & $\dot I_e=10$ & $\dot I_e=37$\\
+\midrule
+$\gamma^{*}$ (s$^{-1}$), Eq.~\eqref{eq:fp} & $3.3333$ & $3.3333$ & $3.3333$\\
+$\dot I^{*}$ (s$^{-1}$), Eq.~\eqref{eq:fp} & $5.0000$ & $5.0000$ & $5.0000$\\
+$H^{*}_{\text{obs}}$ (bits), Eq.~\eqref{eq:fp} & $99.7000$ & $97.0000$ & $88.9000$\\
+Residual $\max|\dot{\mathbf{x}}(\mathbf{x}^{*})|$ & $9.8\times10^{-15}$ & $4.4\times10^{-16}$ & ---\\
+$e_c$ analytic, Eq.~\eqref{eq:ecrit} & $44.880952$ & $4.488095$ & $1.212999$\\
+$e_c$ numeric (eigenvalue crossing) & $44.880952$ & $4.488095$ & $1.212999$\\
+$e_c\,\dot I_e$ (invariant, Cor.~\ref{prop:scaling}) & $44.880952$ & $44.880952$ & $44.880952$\\
+$\omega_c$ analytic, Eq.~\eqref{eq:omega} & $0.925820$ & $0.925820$ & $0.925820$\\
+$\omega_c$ numeric & $0.925820$ & $0.925820$ & $0.925820$\\
+$\max\operatorname{Re}\lambda$ at $e=e_c$ & $-1.5\times10^{-16}$ & $9.8\times10^{-16}$ & $-3.4\times10^{-16}$\\
+\bottomrule
+\end{tabularx}
+\caption{Analytic predictions against numerical evaluation. Agreement is to
+machine precision throughout.}
+\end{table}
+
+\section{Global behaviour and a required domain restriction}
+
+Linear stability is local. Direct integration of
+\eqref{eq:gamma}--\eqref{eq:I} shows that the basin of attraction is bounded
+and that trajectories leaving it do not merely diverge but reach
+\emph{unphysical} states in finite time.
+
+The mechanism is explicit in the equations. If $\gamma$ is driven negative
+while the gap $D$ remains positive, \eqref{eq:H} makes $dH_{\text{obs}}/dt$
+strongly negative; \eqref{eq:I} then drives $\dot I$ negative; and with
+$\dot I<0$ and $(1-\gamma/\gamma_{\max})>1$ the right-hand side of
+\eqref{eq:gamma} is negative and growing in magnitude, so $\gamma$ runs away.
+Nothing in the ansatz prevents this: the system has no positivity-preserving
+structure for $\gamma$ or $\dot I$.
+
+Numerically, with $\dot I_e=10$ and an initial perturbation of $10^{-4}$ in
+$\gamma$:
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Gain} & \textbf{Late-time behaviour}\\
+\midrule
+$e=0.90\,e_c$ & returns to \eqref{eq:fp}; oscillation amplitude $<10^{-7}$\\
+$e=1.01\,e_c$ & bounded oscillation, $\gamma$ amplitude $5.4\times10^{-3}$\,s$^{-1}$\\
+$e=1.02\,e_c$ & bounded oscillation, $\gamma$ amplitude $4.9\times10^{-2}$\,s$^{-1}$\\
+$e=1.04\,e_c$ & escapes: $\gamma\to 0^{-}$ at $t\approx259$\\
+$e=1.08\,e_c$ & escapes: $\gamma\to 0^{-}$ at $t\approx136$\\
+$e=1.20\,e_c$ & escapes: $\gamma\to 0^{-}$ at $t\approx55$\\
+\bottomrule
+\end{tabularx}
+\caption{Behaviour across the stability boundary. A bounded oscillatory regime
+exists in a narrow window above $e_c$; beyond it the trajectory leaves the
+physical domain in finite time.}
+\end{table}
+
+Accordingly the ansatz requires an explicit statement of its domain of
+validity. Two minimal options, either of which is a modelling choice rather
+than a derived result:
+\begin{enumerate}
+\item restrict the admissible parameter range to $e<e_c$ with
+Proposition~\ref{prop:admiss} enforced; or
+\item modify the ansatz so that $\gamma\ge0$ and $\dot I\ge0$ are invariant
+(for example by making the decay terms multiplicative).
+\end{enumerate}
+Option 2 would change the frozen equations and therefore belongs to a future
+versioned artifact, not to this appendix.
+
+\section{What this appendix does and does not establish}
+
+\noindent\textbf{Established.} Within the frozen ansatz, and as consequences of
+it alone: uniqueness and closed form of the equilibrium
+(Prop.~\ref{prop:fp}); independence of the steady-state processing rate from
+the entropy sector (Cor.~\ref{cor:decouple}); the erasure-set equilibrium gap
+(Prop.~\ref{prop:gap}); the admissibility bound (Prop.~\ref{prop:admiss}); a
+unique Hopf boundary with closed-form threshold and frequency
+(Prop.~\ref{prop:hopf}); the exact inverse scaling of that threshold with the
+erasure rate (Cor.~\ref{prop:scaling}); and the finite-time escape requiring a
+domain restriction.
+
+\medskip
+\noindent\textbf{Not established.} This appendix does not derive the ansatz
+from microscopic non-equilibrium dynamics; it analyses a system that v1.0
+already labels phenomenological. It does not relate $\dot I_{\text{model}}$ to
+$\dot I_{\text{erase}}$. It does not give $H_{\max}$ any geometric or horizon
+meaning (Remark~\ref{rem:hmax}). It does not bear on the Gate~0 question, and
+its results must not be cited as progress on the observer--horizon mapping,
+which remains \textbf{UNRESOLVED IN GENERALITY}. It makes no cosmological
+prediction and does not constrain $(\epsilon,\beta,\phi_0)$ in v1.0's
+gravitational-wave template. It determines no numerical values for
+$a,\dots,g$; the benchmark set above is illustrative only, chosen to exhibit
+the structure, and the qualitative conclusions are parameter-independent while
+the tabulated numbers are not.
+
+\medskip
+\noindent\textbf{Nearest open problems made concrete by this analysis.}
+(i) Specify the $\dot I_{\text{model}}$--$\dot I_{\text{erase}}$ relation and
+recompute $e_c$, which by Cor.~\ref{prop:scaling} then ceases to be a free
+parameter. (ii) Determine the criticality of the Hopf bifurcation
+analytically; the numerics above are consistent with a supercritical
+bifurcation whose limit cycle is rapidly destroyed, but no normal-form
+computation is offered here. (iii) Establish whether any positivity-preserving
+modification reproduces the same $e_c$ scaling.
+
+\section{Reproducibility}
+
+All numerical results were produced by
+\texttt{physics\_v1\_0\_ode\_analysis.py}, accompanying this appendix, using
+NumPy 2.4.4 and SciPy 1.17.1. Equilibria are evaluated in closed form and
+verified by residual; stability boundaries are located both analytically via
+\eqref{eq:ecrit} and numerically by bracketing the sign change of
+$\max\operatorname{Re}\lambda(J)$; trajectories are integrated with LSODA at
+tolerances $\mathrm{rtol}=10^{-9}$, $\mathrm{atol}=10^{-12}$, with a
+terminal event on $\gamma=0$. File hashes are recorded in the accompanying
+manifest.
+
+\end{document}
