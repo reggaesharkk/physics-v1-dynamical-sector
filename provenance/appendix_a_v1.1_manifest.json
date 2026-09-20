@@ -1,0 +1,50 @@
+{
+  "artifact": "Appendix A: Dynamical-Sector Analysis v1.1",
+  "title": "Equilibrium and Linear-Stability Analysis of the Physics v1.0 Dynamical Sector",
+  "status": "supplementary; additive to Physics v1.0; not yet deposited",
+  "relation_to_lineage": {
+    "modifies_physics_v1_0": false,
+    "modifies_gate0_tr_v1_0": false,
+    "introduces_new_postulate": false,
+    "bears_on_gate0_verdict": false,
+    "gate0_verdict_unchanged": "UNRESOLVED IN GENERALITY"
+  },
+  "audit_target": {
+    "title": "An Information-Theoretic Framework for Emergent Spacetime Dynamics, Horizon Thermodynamics, and Testable Cosmological Signatures",
+    "version": "Physics v1.0",
+    "doi": "10.17605/OSF.IO/TSW4B",
+    "source_file": "paper_physics_v1.0_release.tex",
+    "source_sha256": "4ee2ce280604ea87303c40f2349974e186f2cf08fdcc8bcfa904517d21bad454",
+    "equations_analysed": "eqs. (9)-(11), dynamical sector"
+  },
+  "files": [
+    {
+      "name": "appendix_a_dynamical_sector_v1.1.tex",
+      "bytes": 18849,
+      "sha256": "f240706f8a2c093565c581779c550c0c6b4862802cce0eb90784682b05f64906"
+    },
+    {
+      "name": "appendix_a_dynamical_sector_v1.1.pdf",
+      "bytes": 216276,
+      "sha256": "9c89e5f9e749c941881bcd77dcaa6f28e3af5b6c73128d2cb6c0a845b5d415f0"
+    },
+    {
+      "name": "physics_v1_0_ode_analysis.py",
+      "bytes": 4386,
+      "sha256": "0e45362953809a6f610b386e284da992a86a1527b16bffc07404cd936c75e221"
+    }
+  ],
+  "qa": {
+    "latex_passes": 2,
+    "rendered_pages": 6,
+    "log_matches_warning_overfull_underfull_undefined": 0,
+    "visual_review": "PASS",
+    "numerics": "analytic vs numeric agreement to machine precision; see Table 1"
+  },
+  "environment": {
+    "pdftex": "3.141592653-2.6-1.40.25 (TeX Live 2023)",
+    "numpy": "2.4.4",
+    "scipy": "1.17.1"
+  },
+  "timestamp_utc": "2026-09-20T16:55:46Z"
+}
