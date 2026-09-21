@@ -6,6 +6,11 @@ Status: FROZEN AUTHOR RELEASE
 
 This release is additive to Physics v1.0, Appendix A v1.1, and Appendix A v1.3. It does not modify the parent phenomenological model or the Gate 0 conclusion.
 
+## Archival record
+
+OSF Registration: U7M6H  
+DOI: 10.17605/OSF.IO/U7M6H
+
 ## Theorem
 
 For alpha, mu, g, beta, delta, K, C > 0 on the exact e-driven Hopf surface,
