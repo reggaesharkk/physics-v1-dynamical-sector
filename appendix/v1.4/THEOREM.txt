@@ -1,0 +1,14 @@
+Appendix A v1.4 — theorem statement
+
+For alpha, mu, g, beta, delta, K, C > 0 on the exact e-driven Hopf surface
+
+e_c = (alpha+g)(alpha+mu)(g+mu) / [beta delta (alpha+mu+g)]
+omega_c^2 = alpha mu g/(alpha+mu+g),
+
+the first Lyapunov coefficient in the stated convention satisfies l1 > 0.
+
+Together with positive transversality, every covered interior e-driven Hopf bifurcation is subcritical.
+
+Boundary: delta=0 (equivalently r=0) is excluded.
+
+Scope: mathematical property of the specified phenomenological ODE family. Gate 0 remains UNRESOLVED IN GENERALITY.
