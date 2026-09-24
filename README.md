@@ -1,5 +1,11 @@
 # Physics v1.0 — Dynamical Sector
 
+## 24 September 2026 archive note
+
+This specialist repository remains the project-specific home for the information-theoretic physics / nonlinear-dynamical-sector lineage. The exact Appendix A v1.4 result and v1.4.1 verification/errata materials remain distinct from the broader Reggae Shark Universe and from the separate LRSC theorem. Gate 0 remains unresolved in generality; no general physical identification between the model-information variable and gravitational/horizon entropy is claimed.
+
+---
+
 Reproducibility repository for **Physics v1.0** and the Appendix A dynamical-sector lineage, by **Prince Upadhyay (Independent Research)**.
 
 ## Archival sources of record
