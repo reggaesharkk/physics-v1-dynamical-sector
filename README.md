@@ -81,6 +81,7 @@ The v1.4 theorem strengthens the nonlinear mathematics of the phenomenological m
 - `appendix/v1.4/` — frozen theorem release documentation and provenance
 - `appendix/v1.4.1/` — author errata / verification-tooling patch
 - `analysis/` — dynamical-sector analysis code
+- `exploratory/recursive_cosmology_sandbox/` — separate toy ODE equilibrium and closure-proxy audit; outside the Appendix A theorem lineage
 - `manifests/` — provenance records
 
 ## Citation
