@@ -1,0 +1,10 @@
+baseline equilibrium [0.832932423 0.735200446 1.454133879] max Re eigenvalue -0.425288052 loop ratio 0.027337637
+higher c equilibrium [0.846480609 0.861256107 1.608201909] max Re eigenvalue -0.440237055 loop ratio 0.013941806
+higher b equilibrium [0.692631401 0.697773011 1.408389235] max Re eigenvalue -0.399359066 loop ratio 0.056251536
+fidelity R*Psi 0.612372289
+zero-noise proximity 1.0 raw fixed-point error 0.775255421
+seed 0 proximity 0.917637138
+seed 1 proximity 0.949130357
+seed 2 proximity 0.922803272
+seed 3 proximity 0.884453875
+seed 4 proximity 0.906386301
