@@ -1,2 +1,1 @@
-﻿\# Physics v1.0 — Dynamical Sector
-...
+﻿\
