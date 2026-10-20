@@ -12,3 +12,4 @@
 * appendix/v1.5/ — Active release containing typeset manuscript and verification tools
 * appendix/v1.4/ — Frozen theorem release
 * analysis/ — Dynamical-sector analysis code
+*   **Lean 4 Formal Verification:** The oundary_verification.lean kernel formally checks and machine-certifies the forward-invariance stability bounds of the positive orthant.
