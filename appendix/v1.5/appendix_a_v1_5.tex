@@ -1,145 +1,303 @@
-﻿\documentclass[11pt,nofootinbib,amsmath,amssymb,aps,prd]{article}
-\usepackage[utf8]{inputenc}
-\usepackage{geometry}
-\geometry{letterpaper, margin=1in}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{amsfonts}
-\usepackage{mathtools}
+\documentclass[11pt,a4paper]{article}
+\usepackage[a4paper,margin=20mm]{geometry}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
 \usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
 \usepackage{hyperref}
+
+\definecolor{primary}{RGB}{20,65,130}
+\definecolor{codebg}{RGB}{246,248,250}
+\definecolor{codeframe}{RGB}{210,218,226}
 
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,      
-    urlcolor=cyan,
-    pdftitle={Appendix A v1.5 - Phase-Space Confinement and Holographic Closure},
-    pdfpagemode=FullScreen,
+    linkcolor=primary,
+    citecolor=primary,
+    urlcolor=primary,
+    pdftitle={Appendix A v1.5 - Positivity-Preserving Phase-Space Confinement and Conditional Holographic Closure},
+    pdfauthor={Prince Upadhyay}
+}
+
+\setlength{\parskip}{5pt plus 2pt minus 1pt}
+\setlength{\parindent}{0pt}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\takeaway}[2]{%
+  \vspace{5pt}\noindent\colorbox{primary!7}{%
+    \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+      \vspace{4pt}\textbf{\color{primary}#1:}\hspace{0.5em}#2\vspace{4pt}%
+    }%
+  }\vspace{5pt}%
+}
+
+\lstdefinelanguage{Lean4}{
+  keywords={import,structure,where,def,theorem,by,unfold,rw,exact,have,intro,refine,noncomputable,section,end,nlinarith,linarith},
+  keywordstyle=\color{primary}\bfseries,
+  comment=[l]{--},
+  morecomment=[s]{/-}{-/},
+  commentstyle=\color{gray}\itshape,
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  aboveskip=6pt,
+  belowskip=6pt,
+  escapeinside={(*@}{@*)}
 }
 
 \begin{document}
 
-\title{\textbf{Appendix A v1.5 --- Phase-Space Confinement and Holographic Closure}}
-\author{\textbf{Prince Upadhyay} \\ 
-Independent Researcher \\ 
-Email: \href{mailto:starxshark@gmail.com}{starxshark@gmail.com}}
-\date{October 20, 2026}
+\begin{center}
+    {\LARGE\bfseries Appendix A v1.5: Positivity-Preserving Phase-Space Confinement, Compact Trapping Box Theorem, and Conditional Holographic Closure}\\[8pt]
+    {\large Supplementary Artifact v1.5 (Upgraded Edition) --- Additive to \textit{Physics v1.0} and Appendices A v1.1--v1.4.1}\\[8pt]
+    {\normalsize \textbf{Prince Upadhyay}}\\
+    {\small Independent Researcher $\cdot$ Email: \href{mailto:starxshark@gmail.com}{starxshark@gmail.com}}\\
+    {\small October 20, 2026 $\cdot$ Zenodo Archive DOIs: \href{https://doi.org/10.5281/zenodo.23497142}{10.5281/zenodo.23497142} $\cdot$ \href{https://doi.org/10.5281/zenodo.23501526}{10.5281/zenodo.23501526}}
+\end{center}
 
-\maketitle
-
+\vspace{2pt}
 \begin{abstract}
-This supplementary artifact establishes the mathematical and microphysical resolution of the twin architectural vulnerabilities identified in prior versions of the \textit{Physics v1.0} dynamical sector. First, we resolve the baseline independence loophole (Gate~0) by mapping the abstract internal observer capacity $H_{\text{max}}$ bijectively to the area of a unique minimal bulk surface $\Sigma$ via the Ryu-Takayanagi holographic entanglement relation. Second, we eliminate the finite-time escape to unphysical negative states across the subcritical Hopf bifurcation ($l_1 > 0$) by replacing standard linear relaxation terms with non-linear, multiplicative soft-wall regularizers. We analytically demonstrate that under this modification, the boundary of the positive orthant $\mathbb{R}^3_+$ becomes an invariant manifold, guaranteeing global physical admissibility under arbitrary parametric stress. All derivations are constructed as additive extensions to the frozen research lineage.
+\noindent Appendices A v1.1 through v1.4.1 established that the three-variable phenomenological dynamical system of \textit{Physics v1.0} admits a unique interior equilibrium whose sole linear instability is a subcritical Hopf bifurcation ($l_1 > 0$) across the interior positive parameter orthant, and demonstrated that post-Hopf trajectories ($e > e_c$) escape the physical positive orthant $\mathbb{R}^3_+$ in finite time. This v1.5 supplement resolves that global phase-space breakdown by constructing a smooth ($C^\infty$) soft-wall completion of the dynamical sector and proving a rigorous global trapping-box theorem. First, we formulate a conditional microphysical closure of Gate~0 via the covariant Hubeny--Rangamani--Takayanagi (HRT) and Bousso causal-diamond entropy bounds, explicitly separating conditional holographic identification from background-independent derivation. Second, by gating the irreversible-erasure sink with $\Psi_{\epsilon_H}(H_{\text{obs}}) = \tanh(H_{\text{obs}}/\epsilon_H)$ and the derivative-feedback channel with $\Phi_{\epsilon_I}(\dot{I}) = \tanh(\dot{I}/\epsilon_I)$, we prove via Nagumo's subtangentiality theorem that both the positive orthant $\mathbb{R}^3_+$ and the compact box $\mathcal{B} = [0,\gamma_{\max}]\times[0,H_{\max}]\times[0,\dot{I}_{\max}]$ are globally forward-invariant for all $t \ge 0$ and all positive parameters. Third, because $\left.dH_{\text{obs}}/dt\right|_* = 0$ at any steady state, the first derivative of the processing gate $\Phi_{\epsilon_I}(\dot{I})$ vanishes identically in the equilibrium Jacobian, leaving the interior equilibrium coordinates $(\gamma^*, \dot{I}^*)$ exact and preserving the v1.4 Jacobian, Hopf threshold $e_c$, and first Lyapunov coefficient $l_1 = +0.519589117351220\dots$ up to exponentially small corrections from both gates at $\epsilon_H = \epsilon_I = 0.01$: $1 - \tanh(\dot{I}^*/\epsilon_I) = 2.77 \times 10^{-87}$ from the processing gate (yielding $\|J_{\text{v1.5}} - J_{\text{v1.4}}\|_F = 1.48 \times 10^{-86}$ and $|l_{1,\text{v1.5}} - l_{1,\text{v1.4}}| = 1.11 \times 10^{-82}$ via third-order gate derivatives) and $\operatorname{sech}^2(H_{\text{obs}}^*/\epsilon_H) = 5.38 \times 10^{-695}$ from the entropy gate. All six boundary-invariance and ceiling-confinement conditions of $\mathcal{B}$ are formalized with complete machine-checked proofs in Lean~4 (\texttt{boundary\_verification.lean}) and verified in arbitrary-precision arithmetic (\texttt{verification\_patch\_v1\_5.py}).
 \end{abstract}
 
-\section{Scope and Historical Status}
-Under the immutability constraints governing this research lineage, the fundamental phenomenological equations of \textit{Physics v1.0} remain structurally fixed. This artifact does not rewrite history; rather, it introduces a necessary non-linear extension to the dynamical relaxation channels and anchors its boundary constraints in a verified quantum gravity substrate. 
+\section{Lineage Provenance and Epistemic Scope}
 
-The verdict \textbf{UNRESOLVED IN GENERALITY} issued in the historic Gate~0 Technical Report is hereby updated to \textbf{RESOLVED AND CLOSED} through the integration of the gauge-gravity correspondence detailed in Section 2.
-
-\section{Holographic Resolution of Gate 0}
-The historical vulnerability of the framework rested on the ungrounded ontological status of the informational saturation limit $H_{\text{max}}$, which behaved as an arbitrary placeholder variable. We ground this variable by establishing a direct mapping to holographic entanglement entropy.
-
-Let the global closed universe be described by a stationary state vector $|\Psi\rangle \in \mathcal{H}_{\text{total}}$ subject to the Wheeler-DeWitt constraint $\hat{H}|\Psi\rangle = 0$. By factorizing the Hilbert space across a spatial boundary domain $\mathcal{A}$ separating the internal self-modeling observer from the environment, the partial trace yields the mixed density operator:
-\begin{equation}
-\rho_{\text{obs}} = \text{Tr}_{\text{env}} \left( |\Psi\rangle\langle\Psi| \right)
-\end{equation}
-
-By asserting the Ryu-Takayanagi formula, the supremum of the observer's internal Von Neumann entropy maps directly to the geometric area of a unique codimension-two minimal bulk surface $\Sigma$ in the dual asymptotically anti-de Sitter ($\text{AdS}_{d+1}$) bulk space, satisfying $\partial\Sigma = \partial\mathcal{A}$:
-\begin{equation}
-\label{eq:rt_entropy}
-H_{\text{max}} \equiv \left. S_{\text{vN}} \right|_{\text{saturation}} = -\text{Tr}(\rho_{\text{obs}} \ln \rho_{\text{obs}}) = \frac{\text{Area}(\Sigma)}{4\ell_P^2 \ln 2} \quad [\text{bits}]
-\end{equation}
-This framework bridges the abstract data ceiling directly to the spatial metric geometry of the local cosmic horizon, sealing the background independence loophole.
-
-\section{The Bounded Soft-Wall Dynamical System}
-To resolve the catastrophic finite-time escape trajectories where state variables ran negative ($\gamma \to 0^-$) upon crossing the subcritical Hopf threshold ($e > e_c$), we introduce non-linear multiplicative soft-wall filters. Let $\epsilon_\gamma, \epsilon_H, \epsilon_I \ll 1$ define micro-scale boundary regularization thresholds. The updated bounded dynamical coordinates are governed by:
-
-\begin{equation}
-\frac{d\gamma}{dt} = a \dot{I} E_{\text{avail}} \left(1 - \frac{\gamma}{\gamma_{\text{max}}}\right) - b\gamma \cdot \tanh\left(\frac{\gamma}{\epsilon_\gamma}\right)
-\end{equation}
-
-\begin{equation}
-\frac{dH_{\text{obs}}}{dt} = c\gamma (H_{\text{max}} - H_{\text{obs}}) - \dot{I}_{\text{erase}} \cdot \frac{1}{2}\left[1 + \tanh\left(\frac{H_{\text{obs}}}{\epsilon_H}\right)\right]
-\end{equation}
-
-\begin{equation}
-\frac{d\dot{I}}{dt} = e \left(\frac{dH_{\text{obs}}}{dt}\right) + f P_{\text{input}} - g\dot{I} \cdot \tanh\left(\frac{\dot{I}}{\epsilon_I}\right)
-\end{equation}
-
-\subsection{Proof of Global Boundary Invariance}
-We establish that the positive orthant $\mathbb{R}^3_+ = \{(\gamma, H_{\text{obs}}, \dot{I}) \in \mathbb{R}^3 \mid \gamma \ge 0, H_{\text{obs}} \ge 0, \dot{I} \ge 0\}$ is a forward-invariant manifold. 
-
-Consider the boundary face $\gamma = 0$. Evaluating Eq.~(3) at this boundary yields:
-\begin{equation}
-\left. \frac{d\gamma}{dt} \right|_{\gamma=0} = a \dot{I} E_{\text{avail}} - 0 = a \dot{I} E_{\text{avail}}
-\end{equation}
-For any physical interior processing state where $\dot{I} > 0$, the vector field satisfies $\left. \frac{d\gamma}{dt} \right|_{\gamma=0} > 0$, forcing trajectories back into the interior.
-
-Similarly, evaluating the observer entropy coordinate at the boundary threshold $H_{\text{obs}} = 0$ yields:
-\begin{equation}
-\left. \frac{dH_{\text{obs}}}{dt} \right|_{H_{\text{obs}}=0} = c\gamma H_{\text{max}} - \dot{I}_{\text{erase}} \cdot \frac{1}{2}\left[1 + \tanh(0)\right] = c\gamma H_{\text{max}} - \frac{1}{2}\dot{I}_{\text{erase}}
-\end{equation}
-By enforcing the admissibility constraint derived in version 1.4 ($\dot{I}_{\text{erase}} \le c \gamma^* H_{\text{max}}$), the multiplicative filter dampens external dissipation channels to zero before crossover can occur, establishing:
-\begin{equation}
-\lim_{H_{\text{obs}} \to 0^+} \left( - \dot{I}_{\text{erase}} \cdot \Psi(H_{\text{obs}}) \right) = 0 \implies \left. \frac{dH_{\text{obs}}}{dt} \right|_{\partial\mathbb{R}^3_+} \ge 0
-\end{equation}
-
-\subsection{Formal Kernel Verification via Lean 4}
-The global forward-invariance of the positive orthant $\mathbb{R}^3_+$ has been formally verified using the Lean~4 mathematical logic kernel. Rather than relying solely on continuous numerical integration channels, the structural boundary checks (including the boundary face vectors evaluated at $\gamma = 0$) were machine-checked as absolute axiomatic constraints. This formal execution establishes a fully certified guarantee that if the system initiates within valid space parameters, the system trajectory cannot escape the physical manifold boundary under arbitrary energy stress.
-
-\begin{verbatim}
-/-- State space coordinates used in Appendix A v1.5. -/
-structure CosmologicalState where
-  gamma : ℝ        -- Reconstruction Capacity (\gamma)
-  H_obs : ℝ        -- Observer Entropy (H_obs)
-  I_dot : ℝ        -- Information Accumulation Rate (\dot{I})
-
-def dgamma_dt (a b E_avail : ℝ) (s : CosmologicalState) : ℝ :=
-  a * s.I_dot * E_avail - b * s.gamma
-
-def dHobs_dt (c H_max I_erase epsH : ℝ) (s : CosmologicalState) : ℝ :=
-  c * s.gamma * (H_max - s.H_obs) - I_erase * (1/2) * (1 + Real.tanh (s.H_obs / epsH))
-
-def dIdot_dt (e f g c H_max I_erase epsH epsI : ℝ) (s : CosmologicalState) : ℝ :=
-  e * (dHobs_dt c H_max I_erase epsH s) + f - g * s.I_dot * Real.tanh (s.I_dot / epsI)
-
-def F (a b c e f g H_max E_avail I_erase epsH epsI : ℝ) (s : CosmologicalState) : CosmologicalState :=
-{ gamma := dgamma_dt a b E_avail s
-, H_obs := dHobs_dt c H_max I_erase epsH s
-, I_dot := dIdot_dt e f g c H_max I_erase epsH epsI s }
-\end{verbatim}
-
-\subsection{Processing Channel Safety}
-Finally, for the processing channel $\dot{I} = 0$, Eq.~(5) reduces to:
-\begin{equation}
-\left. \frac{d\dot{I}}{dt} \right|_{\dot{I}=0} = e \left(\frac{dH_{\text{obs}}}{dt}\right) + f P_{\text{input}} - 0 = e \left[ c\gamma (H_{\text{max}} - H_{\text{obs}}) - \dot{I}_{\text{erase}} \right] + f P_{\text{input}}
-\end{equation}
-Because the input power $P_{\text{input}} > 0$ forms a constant driver, the vector field points strictly into the positive interior domain. Thus, by Nagumo's Theorem, any trajectory originating within the physical parameters is trapped safely inside $\mathbb{R}^3_+$ for all $t > 0$. Non-physical collapse is mathematically impossible.
-
-\section{Linear Stability and Invariant Matrix Matching}
-A key technical benefit of this design is that for any healthy interior operational steady state lying far from the regularized walls ($\gamma^* \gg \epsilon_\gamma$, $H_{\text{obs}}^* \gg \epsilon_H$, $\dot{I^* \gg \epsilon_I}$), the activation metrics stabilize perfectly:
-\begin{equation}
-\tanh\left(\frac{x^*}{\epsilon_i}\right) \to 1.0, \quad \text{sech}^2\left(\frac{x^*}{\epsilon_i}\right) \to 0.0
-\end{equation}
-Consequently, the local Jacobian matrix $J$ at the steady state matches the original analytical invariants of Appendix~A v1.4 to machine precision:
-\begin{equation}
-J = \begin{pmatrix}
--\alpha & 0 & \beta \\
--\delta & -\mu & 0 \\
-e\delta & e\mu & -g
-\end{pmatrix}
-\end{equation}
-The subcritical Hopf bifurcation threshold ($e_c$) and the analytic positivity validation ($l_1 > 0$) verified in your preceding lineage are completely preserved. The system maintains its predictable local properties while acquiring absolute global protection against structural breakdown.
-
-\section{Conclusion and Lineage Status}
-Appendix A v1.5 successfully closes the Gate~0 loophole and stabilizes the phase-space coordinates of the \textit{Physics v1.0} universe. By linking internal state complexity to holographic bulk boundaries and deploying soft-wall constraints, the framework is now fully prepared for formal journal peer review.
-
-\section*{References}
+Under the immutability rules of the \textit{Physics v1.0} research lineage (\href{https://doi.org/10.17605/OSF.IO/N3DQU}{10.17605/OSF.IO/N3DQU}), the original unregularized ODE ansatz analyzed in Appendix~A v1.1 and the exact symbolic positivity certificate of Appendix~A v1.4/v1.4.1 (\href{https://doi.org/10.17605/OSF.IO/U7M6H}{10.17605/OSF.IO/U7M6H}, \href{https://doi.org/10.17605/OSF.IO/S7WHX}{10.17605/OSF.IO/S7WHX}) remain frozen and unmodified. Specifically, Appendix~A v1.1 identified two minimal options to address the finite-time escape to $\gamma < 0$ across the Hopf boundary $e = e_c$:
 \begin{enumerate}
-    \item Prince Upadhyay. ``An Information-Theoretic Framework for Emergent Spacetime Dynamics, Horizon Thermodynamics, and Testable Cosmological Signatures.'' OSF DOI: 10.17605/OSF.IO/N3DQU, 2026.
-    \item T. Jacobson. ``Thermodynamics of Spacetime: Einstein Equation of State.'' \textit{Physical Review Letters}, vol. 75, no. 7, pp. 1260--1263, 1995.
-    \item S. Ryu and T. Takayanagi. ``Holographic Derivation of Entanglement Entropy from AdS/CFT.'' \textit{Physical Review Letters}, vol. 96, no. 18, 181602, 2006.
+\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}
+    \item Restrict the admissible parameter domain to the linearly stable regime $e < e_c$ with the erasure admissibility bound $\dot{I}_{\text{erase}} \le c\gamma^* H_{\max}$ enforced; or
+    \item Introduce a versioned non-linear modification of the ansatz so that $\mathbb{R}^3_+ = \{(\gamma, H_{\text{obs}}, \dot{I}) \in \mathbb{R}^3 \mid \gamma \ge 0,\, H_{\text{obs}} \ge 0,\, \dot{I} \ge 0\}$ is globally forward-invariant while reproducing the v1.1--v1.4 equilibrium and Hopf scaling in the interior regime.
 \end{enumerate}
+This document executes Option~2 as a separate versioned artifact (v1.5) and establishes a conditional holographic dictionary for the saturation capacity $H_{\max}$.
+
+\section{Conditional Holographic Dictionary for Gate 0}
+
+In \textit{Physics v1.0}, the observer von Neumann entropy $H_{\text{obs}}(t) = -\operatorname{Tr}(\rho_{\text{obs}}\log_2 \rho_{\text{obs}})$ is bounded by an informational saturation capacity $H_{\max}$ (in bits). The Gate~0 Technical Report recorded the bridge between an abstract subsystem factorization $\mathcal{H}_{\text{total}} = \mathcal{H}_{\text{obs}} \otimes \mathcal{H}_{\text{env}}$ and geometric horizon entropy $A/(4\ell_P^2\ln 2)$ as \textbf{UNRESOLVED IN GENERALITY} because an arbitrary algebraic tensor factorization need not correspond to a spatially localized region with a well-defined boundary area.
+
+To make the microphysical assumption required to close Gate~0 mathematically explicit, we replace static Ryu--Takayanagi identification with a covariant causal-diamond localization postulate:
+
+\begin{proposition}[Conditional Holographic Closure of Gate 0]
+Let $(\mathcal{M}, g_{\mu\nu})$ be a $(3+1)$-dimensional semiclassical spacetime, and suppose the observer subsystem $\mathcal{H}_{\text{obs}}$ is defined by the algebra of quantum fields localized within the causal diamond $\mathcal{D}(\mathcal{A})$ of a spacelike ball $\mathcal{A}$ with smooth codimension-two boundary $\partial\mathcal{A}$. Under the covariant Bousso entropy bound and the Hubeny--Rangamani--Takayanagi (HRT) extremal surface prescription, if $\Sigma_{\text{HRT}}$ is the unique minimal-area extremal surface homologous to $\mathcal{A}$ with $\partial\Sigma_{\text{HRT}} = \partial\mathcal{A}$ and stationary area $\operatorname{Area}(\Sigma_{\text{HRT}}) = A_{\Sigma}$, then the state-space supremum of the observer's fine-grained von Neumann entropy in bits is fixed by
+\begin{equation}
+\label{eq:hrt_dictionary}
+H_{\max} \equiv \sup_{\rho_{\text{obs}} \in \mathcal{S}(\mathcal{D}(\mathcal{A}))} \left[-\operatorname{Tr}\!\left(\rho_{\text{obs}}\log_2 \rho_{\text{obs}}\right)\right] = \frac{\operatorname{Area}(\Sigma_{\text{HRT}})}{4\ell_P^2 \ln 2} \quad [\text{bits}].
+\end{equation}
+\end{proposition}
+
+\begin{remark}[Distinction Between Conditional Closure and General Derivation]
+Equation~\eqref{eq:hrt_dictionary} closes Gate~0 \emph{conditionally} within the class of spatially localized causal-diamond subsystems admitting a semiclassical holographic or covariant entropy bound. For abstract, non-geometric Hilbert-space factorizations $\mathcal{H}_{\text{total}} = \mathcal{H}_{\text{obs}} \otimes \mathcal{H}_{\text{env}}$ without a spatial boundary $\partial\mathcal{A}$, Gate~0 remains open. None of the dynamical-sector theorems in Sections 3--6 depend on Eq.~\eqref{eq:hrt_dictionary}; they hold for any constant $H_{\max} > 0$.
+\end{remark}
+
+\section{Upgraded Soft-Wall Dynamical System and Global Trapping Box Theorem}
+
+In the unregularized v1.0 system, finite-time escape from $\mathbb{R}^3_+$ occurs through a two-stage boundary breach: (i) when $H_{\text{obs}}$ approaches $0$, the constant erasure term $-\dot{I}_{\text{erase}}$ remains active and drives $H_{\text{obs}} < 0$; and (ii) during large-amplitude oscillations above the subcritical Hopf threshold ($e > e_c$), negative entropy rates $dH_{\text{obs}}/dt < 0$ enter the derivative-feedback term $e\,(dH_{\text{obs}}/dt)$ unattenuated at $\dot{I} = 0$, driving $\dot{I} < 0$ and subsequently pulling $\gamma < 0$ via $a\dot{I}\mathcal{E}_{\text{avail}}(1-\gamma/\gamma_{\max})$.
+
+Note that replacing $-\dot{I}_{\text{erase}}$ with $-\frac{1}{2}\dot{I}_{\text{erase}}[1+\tanh(H_{\text{obs}}/\epsilon_H)]$ or leaving $e\,(dH_{\text{obs}}/dt)$ ungated at $\dot{I}=0$ does \emph{not} render $\mathbb{R}^3_+$ forward-invariant, because $\frac{1}{2}[1+\tanh(0)] = \frac{1}{2} \neq 0$ leaves a negative sink $-\frac{1}{2}\dot{I}_{\text{erase}}$ at $H_{\text{obs}}=0$ whenever $\gamma < \dot{I}_{\text{erase}}/(2cH_{\max})$, and an ungated $e\,(dH_{\text{obs}}/dt)$ drives $\left.\frac{d\dot{I}}{dt}\right|_{\dot{I}=0} < 0$ whenever $e\,(dH_{\text{obs}}/dt) < -f\mathcal{P}_{\text{input}}$.
+
+To achieve unconditional global forward-invariance of $\mathbb{R}^3_+$ via smooth ($C^\infty$) real-analytic multipliers that vanish at $H_{\text{obs}}=0$ and $\dot{I}=0$ and saturate to $1$ in the interior, let $\epsilon_H, \epsilon_I > 0$ denote micro-scale boundary regularization widths ($\epsilon_H \ll H_{\max}$, $\epsilon_I \ll \dot{I}^*$) and define the gates
+\begin{equation}
+\label{eq:gates}
+\Psi_{\epsilon_H}(H_{\text{obs}}) \equiv \tanh\!\left(\frac{H_{\text{obs}}}{\epsilon_H}\right), \qquad \Phi_{\epsilon_I}(\dot{I}) \equiv \tanh\!\left(\frac{\dot{I}}{\epsilon_I}\right).
+\end{equation}
+The upgraded v1.5 dynamical system is governed by
+\begin{align}
+\frac{d\gamma}{dt} &= a \dot{I} \mathcal{E}_{\text{avail}}\!\left(1 - \frac{\gamma}{\gamma_{\max}}\right) - b\gamma, \label{eq:v15_gamma} \\
+\frac{dH_{\text{obs}}}{dt} &= c\gamma (H_{\max} - H_{\text{obs}}) - \dot{I}_{\text{erase}}\,\tanh\!\left(\frac{H_{\text{obs}}}{\epsilon_H}\right), \label{eq:v15_H} \\
+\frac{d\dot{I}}{dt} &= e\,\tanh\!\left(\frac{\dot{I}}{\epsilon_I}\right)\!\left(\frac{dH_{\text{obs}}}{dt}\right) + f\mathcal{P}_{\text{input}} - g\dot{I}, \label{eq:v15_I}
+\end{align}
+where all parameters $a, b, c, e, f, g, \mathcal{E}_{\text{avail}}, \mathcal{P}_{\text{input}}, \dot{I}_{\text{erase}}, \gamma_{\max}, H_{\max}, \epsilon_H, \epsilon_I$ are strictly positive.
+
+\begin{theorem}[Global Forward-Invariance of $\mathbb{R}^3_+$ and Compact Trapping Box $\mathcal{B}$]
+\label{thm:global_invariance}
+For all strictly positive parameters and every feedback gain $e > 0$:
+\begin{enumerate}
+\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}
+    \item The non-negative orthant $\mathbb{R}^3_+ = \{(\gamma, H_{\text{obs}}, \dot{I}) \in \mathbb{R}^3 \mid \gamma \ge 0,\, H_{\text{obs}} \ge 0,\, \dot{I} \ge 0\}$ is positively invariant under the flow of Eqs.~\eqref{eq:v15_gamma}--\eqref{eq:v15_I}.
+    \item Define the maximum entropy-rate bound $M_H \equiv c\gamma_{\max}H_{\max} + \dot{I}_{\text{erase}}$ and the processing ceiling
+    \begin{equation}
+    \label{eq:I_max}
+    \dot{I}_{\max} \equiv \frac{e M_H + f\mathcal{P}_{\text{input}}}{g} > 0.
+    \end{equation}
+    Then the compact box $\mathcal{B} \equiv [0, \gamma_{\max}] \times [0, H_{\max}] \times [0, \dot{I}_{\max}] \subset \mathbb{R}^3_+$ is positively invariant and globally absorbing within $[0,\gamma_{\max}]\times[0,H_{\max}]\times[0,\infty)$. Consequently, every trajectory originating in $\mathcal{B}$ exists globally for all $t \in [0,\infty)$ and never escapes to unphysical negative states or blows up in finite time.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Since the vector field $F = (d\gamma/dt, dH_{\text{obs}}/dt, d\dot{I}/dt)$ of Eqs.~\eqref{eq:v15_gamma}--\eqref{eq:v15_I} is $C^\infty$ (and therefore locally Lipschitz) on $\mathbb{R}^3$, by Nagumo's subtangentiality theorem a closed convex box $\mathcal{B} = \prod_{i=1}^3 [x_{i,\min}, x_{i,\max}]$ is positively invariant if and only if $F_i(x) \ge 0$ whenever $x \in \mathcal{B}$ with $x_i = x_{i,\min}$ and $F_i(x) \le 0$ whenever $x \in \mathcal{B}$ with $x_i = x_{i,\max}$. We check all six boundary faces of $\mathcal{B}$ (and the three lower faces of $\mathbb{R}^3_+$):
+\begin{enumerate}
+\setlength{\itemsep}{2pt}
+    \item \textbf{Face 1 --- Lower $\gamma$-face ($\gamma = 0$, $\dot{I} \ge 0$):} Evaluating Eq.~\eqref{eq:v15_gamma} at $\gamma = 0$ yields
+    \begin{equation}
+    \left.\frac{d\gamma}{dt}\right|_{\gamma=0} = a\dot{I}\mathcal{E}_{\text{avail}}(1 - 0) - b(0) = a\dot{I}\mathcal{E}_{\text{avail}} \ge 0,
+    \end{equation}
+    with strict positivity whenever $\dot{I} > 0$.
+    \item \textbf{Face 2 --- Upper $\gamma$-ceiling ($\gamma = \gamma_{\max}$, $\dot{I} \ge 0$):} Evaluating Eq.~\eqref{eq:v15_gamma} at $\gamma = \gamma_{\max}$ yields
+    \begin{equation}
+    \left.\frac{d\gamma}{dt}\right|_{\gamma=\gamma_{\max}} = a\dot{I}\mathcal{E}_{\text{avail}}\!\left(1 - \frac{\gamma_{\max}}{\gamma_{\max}}\right) - b\gamma_{\max} = -b\gamma_{\max} < 0.
+    \end{equation}
+    \item \textbf{Face 3 --- Lower $H_{\text{obs}}$-face ($H_{\text{obs}} = 0$, $\gamma \ge 0$):} Because $\tanh(0/\epsilon_H) = \tanh(0) = 0$, evaluating Eq.~\eqref{eq:v15_H} at $H_{\text{obs}} = 0$ gives
+    \begin{equation}
+    \left.\frac{dH_{\text{obs}}}{dt}\right|_{H_{\text{obs}}=0} = c\gamma(H_{\max} - 0) - \dot{I}_{\text{erase}}\tanh(0) = c\gamma H_{\max} \ge 0 \quad \forall \gamma \ge 0.
+    \end{equation}
+    Notably, this non-negativity holds unconditionally for every $\dot{I}_{\text{erase}} > 0$ and every $\gamma \ge 0$, without requiring $\gamma(t) \ge \gamma^*$.
+    \item \textbf{Face 4 --- Upper $H_{\text{obs}}$-ceiling ($H_{\text{obs}} = H_{\max}$, $\gamma \ge 0$):} Since $H_{\max}/\epsilon_H > 0 \implies \tanh(H_{\max}/\epsilon_H) > 0$,
+    \begin{equation}
+    \left.\frac{dH_{\text{obs}}}{dt}\right|_{H_{\text{obs}}=H_{\max}} = c\gamma(0) - \dot{I}_{\text{erase}}\tanh\!\left(\frac{H_{\max}}{\epsilon_H}\right) < 0.
+    \end{equation}
+    \item \textbf{Face 5 --- Lower $\dot{I}$-face ($\dot{I} = 0$, arbitrary $\gamma, H_{\text{obs}} \in \mathbb{R}$):} Because $\tanh(0/\epsilon_I) = 0$, both the feedback term $e\tanh(0)(dH_{\text{obs}}/dt)$ and the linear damping $-g(0)$ vanish identically at $\dot{I} = 0$:
+    \begin{equation}
+    \left.\frac{d\dot{I}}{dt}\right|_{\dot{I}=0} = e\cdot 0\cdot \frac{dH_{\text{obs}}}{dt} + f\mathcal{P}_{\text{input}} - g(0) = f\mathcal{P}_{\text{input}} > 0.
+    \end{equation}
+    \item \textbf{Face 6 --- Upper $\dot{I}$-ceiling ($\dot{I} = \dot{I}_{\max}$ on $\mathcal{B}$):} For any $(\gamma, H_{\text{obs}}) \in [0,\gamma_{\max}]\times[0,H_{\max}]$, $dH_{\text{obs}}/dt \le c\gamma_{\max}H_{\max} \le c\gamma_{\max}H_{\max} + \dot{I}_{\text{erase}} = M_H$. Since $0 \le \tanh(\dot{I}/\epsilon_I) \le 1$, at $\dot{I} = \dot{I}_{\max}$ we have
+    \begin{equation}
+    \left.\frac{d\dot{I}}{dt}\right|_{\dot{I}=\dot{I}_{\max}} \le e M_H + f\mathcal{P}_{\text{input}} - g\dot{I}_{\max} = 0.
+    \end{equation}
+\end{enumerate}
+Since $F$ points inward on every boundary face of $\mathcal{B}$ and $\mathcal{B}$ is compact, standard ODE global existence guarantees that all trajectories in $\mathcal{B}$ are defined and confined to $\mathcal{B}$ for all $t \ge 0$.
+\end{proof}
+
+\takeaway{Key Structural Insight}{In the post-Hopf unstable regime ($e > e_c$), the unique interior equilibrium loses stability via a subcritical Hopf bifurcation ($l_1 > 0$), while the boundary of the compact box $\mathcal{B} = [0,\gamma_{\max}]\times[0,H_{\max}]\times[0,\dot{I}_{\max}]$ is strictly inward-pointing. Instead of escaping to $-\infty$ in finite time as in v1.0, trajectories repelled from the equilibrium are trapped inside $\mathcal{B}$ and settle onto a globally bounded relaxation oscillation.}
+
+\section{Formal Kernel Verification in Lean 4 (All Six Faces of $\mathcal{B}$)}
+
+To provide a complete machine-checked guarantee of Theorem~\ref{thm:global_invariance}, the accompanying Lean~4 file \texttt{boundary\_verification.lean} formalizes Eqs.~\eqref{eq:v15_gamma}--\eqref{eq:I_max} over Mathlib's real numbers $\mathbb{R}$ and proves all six boundary face conditions (three lower orthant faces and three upper ceiling faces), an entropy-rate bound lemma (\texttt{dHobs\_dt\_le\_M\_H}), and the unified 6-face certificate (\texttt{compact\_box\_nagumo\_certificate}) with zero \texttt{sorry} placeholders:
+
+\begin{lstlisting}[language=Lean4]
+/-- Upper ceiling theorems (Faces 2, 4, 6) and lower face theorems (Faces 1, 3, 5). -/
+theorem dHobs_dt_neg_at_ceiling
+    (c H_max I_erase epsH : (*@$\mathbb{R}$@*)) (hIe : 0 < I_erase) (htanh : 0 < Real.tanh (H_max / epsH))
+    (s : CosmologicalState) (hH : s.H_obs = H_max) :
+    dHobs_dt c H_max I_erase epsH s < 0 := by
+  unfold dHobs_dt
+  rw [hH, sub_self, mul_zero, zero_sub]
+  exact neg_lt_zero.mpr (mul_pos hIe htanh)
+
+theorem dIdot_dt_nonpos_at_ceiling
+    (e f g P_input c gamma_max H_max I_erase epsH epsI : (*@$\mathbb{R}$@*))
+    (he : 0 (*@$\le$@*) e) (hg : 0 < g) (hMH : 0 (*@$\le$@*) M_H c gamma_max H_max I_erase)
+    (s : CosmologicalState)
+    (hI : s.I_dot = I_dot_max e f g P_input c gamma_max H_max I_erase)
+    (hdH : dHobs_dt c H_max I_erase epsH s (*@$\le$@*) M_H c gamma_max H_max I_erase)
+    (htanh_nonneg : 0 (*@$\le$@*) Real.tanh (s.I_dot / epsI))
+    (htanh_le_one : Real.tanh (s.I_dot / epsI) (*@$\le$@*) 1) :
+    dIdot_dt e f g P_input c H_max I_erase epsH epsI s (*@$\le$@*) 0 := by
+  unfold dIdot_dt I_dot_max at *
+  have hg_ne : g (*@$\neq$@*) 0 := ne_of_gt hg
+  have h_g_mul : g * s.I_dot = e * M_H c gamma_max H_max I_erase + f * P_input := by
+    rw [hI]
+    exact mul_div_cancel0 (e * M_H c gamma_max H_max I_erase + f * P_input) hg_ne
+  have h_gate_bound :
+      e * Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s (*@$\le$@*)
+      e * M_H c gamma_max H_max I_erase := by
+    nlinarith
+  linarith
+\end{lstlisting}
+
+\section{Exact Equilibrium and Multi-Scale Spectral Invariance in the Interior}
+
+A critical advantage of gating only the erasure sink $\dot{I}_{\text{erase}}\tanh(H_{\text{obs}}/\epsilon_H)$ and the derivative-feedback term $e\tanh(\dot{I}/\epsilon_I)(dH_{\text{obs}}/dt)$---while keeping the linear relaxation terms $-b\gamma$ and $-g\dot{I}$ unperturbed---is that the interior steady-state coordinates $(\gamma^*, \dot{I}^*)$ are exact and the first-order gate derivative vanishes identically at equilibrium:
+
+\begin{proposition}[Exactness of $(\gamma^*,\dot{I}^*)$ and Multi-Scale Gate Perturbation Bounds]
+\label{prop:jacobian_invariance}
+At any equilibrium $(\gamma^*, H_{\text{obs}}^*, \dot{I}^*)$ of Eqs.~\eqref{eq:v15_gamma}--\eqref{eq:v15_I}:
+\begin{enumerate}
+\setlength{\itemsep}{2pt}
+    \item Since $\left.dH_{\text{obs}}/dt\right|_* = 0$, Eq.~\eqref{eq:v15_I} reduces at steady state to $f\mathcal{P}_{\text{input}} - g\dot{I}^* = 0$ and Eq.~\eqref{eq:v15_gamma} reduces to $K(1-\gamma^*/\gamma_{\max}) - b\gamma^* = 0$ with $K \equiv a\mathcal{E}_{\text{avail}}\dot{I}^*$. Thus $\dot{I}^* = f\mathcal{P}_{\text{input}}/g$ and $\gamma^* = K\gamma_{\max}/(b\gamma_{\max}+K)$ are \textbf{identical} to Proposition~2 of Appendix~A v1.1 with zero $\epsilon$-dependence.
+    \item When linearizing Eq.~\eqref{eq:v15_I} about the equilibrium, the product rule applied to $e\tanh(\dot{I}/\epsilon_I)(dH_{\text{obs}}/dt)$ yields
+    \begin{equation}
+    \left.\frac{\partial}{\partial \dot{I}}\!\left[e\tanh\!\left(\frac{\dot{I}}{\epsilon_I}\right)\frac{dH_{\text{obs}}}{dt}\right]\right|_* = \frac{e}{\epsilon_I}\operatorname{sech}^2\!\left(\frac{\dot{I}^*}{\epsilon_I}\right)\underbrace{\left.\frac{dH_{\text{obs}}}{dt}\right|_*}_{=\,0} + e\tanh\!\left(\frac{\dot{I}^*}{\epsilon_I}\right)\underbrace{\left.\frac{\partial (dH_{\text{obs}}/dt)}{\partial \dot{I}}\right|_*}_{=\,0} = 0.
+    \end{equation}
+    Hence the $(3,3)$ entry of the Jacobian is exactly $-g$, with no $\operatorname{sech}^2(\dot{I}^*/\epsilon_I)$ linear damping artifact.
+    \item In coordinates $(\gamma, H_{\text{obs}}, \dot{I})$, the exact Jacobian of the upgraded system~\eqref{eq:v15_gamma}--\eqref{eq:v15_I} at equilibrium is
+    \begin{equation}
+    \label{eq:J_v15}
+    J_{\text{v1.5}} = \begin{pmatrix}
+    -\alpha & 0 & \beta \\
+    \delta_{\epsilon} & -\mu_{\epsilon} & 0 \\
+    e_{\text{eff}}\delta_{\epsilon} & -e_{\text{eff}}\mu_{\epsilon} & -g
+    \end{pmatrix},
+    \end{equation}
+    where $\alpha$ and $\beta$ are identical to v1.1--v1.4, $e_{\text{eff}} = e\tanh(\dot{I}^*/\epsilon_I)$, $\delta_{\epsilon} = c(H_{\max}-H_{\text{obs}}^*)$, and $\mu_{\epsilon} = c\gamma^* + \frac{\dot{I}_{\text{erase}}}{\epsilon_H}\operatorname{sech}^2(H_{\text{obs}}^*/\epsilon_H)$. Two distinct exponential gate scales govern the departure from v1.4:
+    \begin{itemize}
+    \setlength{\itemsep}{1pt}
+        \item \textbf{Processing gate scale ($\epsilon_I$):} $1 - \tanh(\dot{I}^*/\epsilon_I) \sim 2e^{-2\dot{I}^*/\epsilon_I}$, which dominates the Frobenius norm difference $\|J_{\text{v1.5}} - J_{\text{v1.4}}\|_F = O(e^{-2\dot{I}^*/\epsilon_I})$ ($1.48 \times 10^{-86}$ at $\dot{I}^*=1, \epsilon_I=0.01$) and, via the second and third derivatives of $\tanh(\dot{I}/\epsilon_I)$ in the normal-form bilinear/trilinear contractions, shifts $l_1$ by $O(\epsilon_I^{-2}\operatorname{sech}^2(\dot{I}^*/\epsilon_I)) = 1.11 \times 10^{-82}$.
+        \item \textbf{Entropy gate scale ($\epsilon_H$):} $\operatorname{sech}^2(H_{\text{obs}}^*/\epsilon_H) \sim 4e^{-2H_{\text{obs}}^*/\epsilon_H}$, which shifts $H_{\text{obs}}^*$ and $\mu_\epsilon$ by $O(e^{-2H_{\text{obs}}^*/\epsilon_H})$ ($5.38 \times 10^{-695}$ at $H_{\text{obs}}^*=8, \epsilon_H=0.01$).
+    \end{itemize}
+\end{enumerate}
+\end{proposition}
+
+\section{High-Precision Verification and Global Post-Hopf Benchmark}
+
+All results are verified by \texttt{verification\_patch\_v1\_5.py} using 60-digit and 750-digit \texttt{mpmath} arithmetic. Table~\ref{tab:audit50} records the multi-scale spectral and Frobenius-norm verification at the v1.3/v1.4 audit slice ($a=0.5, b=1, c=0.5, f=g=1, \mathcal{E}_{\text{avail}}=2, \mathcal{P}_{\text{input}}=1, \dot{I}_{\text{erase}}=0.5, \gamma_{\max}=1, H_{\max}=10$, with $\epsilon_H = \epsilon_I = 0.01$). Table~\ref{tab:confinement} compares the global post-Hopf behavior of the upgraded v1.5 system against the finite-time escapes of Table~2 in Appendix~A v1.1 ($a=b=c=f=g=\mathcal{E}_{\text{avail}}=1, \gamma_{\max}=10, H_{\max}=100, \mathcal{P}_{\text{input}}=5, \dot{I}_{\text{erase}}=10, \epsilon_H=\epsilon_I=0.05$).
+
+\begin{table}[ht!]
+\centering
+\caption{High-precision spectral, Frobenius-norm, and two-gate scale verification at the v1.3/v1.4 audit slice ($\epsilon_H = \epsilon_I = 0.01$).}
+\vspace{4pt}
+\small
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Quantity} & \textbf{Verified Value (60-Digit / 750-Digit \texttt{mpmath} Evaluation)} \\
+\midrule
+Interior equilibrium $(\gamma^*, H_{\text{obs}}^*, \dot{I}^*)$ & $(0.5,\; 8.0,\; 1.0)$ \\
+Analytic Hopf threshold $e_c$ & $135/26 = 5.19230769230769230769230769\dots$ \\
+Hopf frequency $\omega_c$ ($\text{s}^{-1}$) & $0.39223227027636806384832493\dots$ \\
+First Lyapunov coefficient $l_1 = \operatorname{Re}(G_{21})/(2\omega_c)$ & $+0.51958911735122026898339319\dots$ (subcritical, $l_1 > 0$) \\
+Eigenvector residual $\|Jq - i\omega_c q\|_\infty$ & $6.23 \times 10^{-62}$ \\
+Processing gate deviation $1 - \tanh(\dot{I}^*/\epsilon_I)$ & $2.76779305347 \times 10^{-87}$ ($\dot{I}^*/\epsilon_I = 100$) \\
+Entropy gate deviation $\operatorname{sech}^2(H_{\text{obs}}^*/\epsilon_H)$ & $5.38132158610 \times 10^{-695}$ ($H_{\text{obs}}^*/\epsilon_H = 800$) \\
+Soft-wall equilibrium shift $|H_{\text{obs},\text{v1.5}}^* - H_{\text{obs},\text{v1.4}}^*|$ & $5.38132158610 \times 10^{-695}$ ($< 10^{-694} \ll 10^{-50}$) \\
+Jacobian Frobenius norm $\|J_{\text{v1.5}} - J_{\text{v1.4}}\|_F$ & $1.48135280746 \times 10^{-86}$ ($< 10^{-85} \ll 10^{-50}$) \\
+Hopf threshold shift $|e_{c,\text{v1.5}} - e_{c,\text{v1.4}}|$ & $1.43712331623 \times 10^{-86}$ ($< 10^{-85} \ll 10^{-50}$) \\
+First Lyapunov shift $|l_{1,\text{v1.5}} - l_{1,\text{v1.4}}|$ & $1.10793084174 \times 10^{-82}$ ($< 10^{-81} \ll 10^{-50}$) \\
+Linear gate derivative $\partial_{\dot{I}}[e\tanh(\dot{I}/\epsilon_I)(dH_{\text{obs}}/dt)]_*$ & $0$ (vanishes identically since $dH_{\text{obs}}/dt|_* = 0$) \\
+\bottomrule
+\end{tabularx}
+\label{tab:audit50}
+\end{table}
+
+\begin{table}[ht!]
+\centering
+\caption{Global post-Hopf trajectory confinement on the v1.1 benchmark ($\dot{I}_{\text{erase}}=10, e_c = 4.488095, \epsilon_H=\epsilon_I=0.05$). Every trajectory that escaped to $\gamma < 0$ in finite time under v1.0 is confined strictly inside $\mathcal{B} = [0,\gamma_{\max}]\times[0,H_{\max}]\times[0,\dot{I}_{\max}]$ under v1.5.}
+\vspace{4pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcccl}
+\toprule
+\textbf{Gain} & \textbf{v1.0 / v1.1 Behaviour} & \textbf{v1.5 $\min\gamma(t)$} & \textbf{v1.5 $\max\gamma(t)$} & \textbf{v1.5 $\min H_{\text{obs}}(t)$} & \textbf{v1.5 Global Regime ($t \in [0,400]$)} \\
+\midrule
+$e = 0.90\,e_c$ & Decays to eq.~(6) & $3.333272$ & $3.333433$ & $96.999947$ & Asymptotically stable equilibrium \\
+$e = 1.01\,e_c$ & Bounded osc.\ ($5.4\times 10^{-3}$) & $3.331644$ & $3.334981$ & $96.998534$ & Bounded interior oscillation \\
+$e = 1.04\,e_c$ & Escapes: $\gamma \to 0^-$ at $t \approx 259$ & $0.005682$ & $9.720486$ & $0.003339$ & Globally confined relaxation cycle in $\mathcal{B}$ \\
+$e = 1.08\,e_c$ & Escapes: $\gamma \to 0^-$ at $t \approx 136$ & $0.005461$ & $9.730970$ & $0.003222$ & Globally confined relaxation cycle in $\mathcal{B}$ \\
+$e = 1.20\,e_c$ & Escapes: $\gamma \to 0^-$ at $t \approx 55$ & $0.004889$ & $9.758112$ & $0.002921$ & Globally confined relaxation cycle in $\mathcal{B}$ \\
+$e = 2.00\,e_c$ & Escapes: $\gamma \to 0^-$ at $t \approx 19$ & $0.002885$ & $9.854966$ & $0.001854$ & Globally confined relaxation cycle in $\mathcal{B}$ \\
+\bottomrule
+\end{tabular}%
+}
+\label{tab:confinement}
+\end{table}
+
+\begin{thebibliography}{9}
+\bibitem{upadhyay_v10} P. Upadhyay, ``An Information-Theoretic Framework for Emergent Spacetime Dynamics, Horizon Thermodynamics, and Testable Cosmological Signatures,'' OSF Preprint, DOI: \href{https://doi.org/10.17605/OSF.IO/N3DQU}{10.17605/OSF.IO/N3DQU}, 2026.
+\bibitem{upadhyay_v14} P. Upadhyay, ``Appendix A v1.4: Analytic Positivity Theorem and v1.4.1 Verification Patch,'' OSF Archival Records, DOIs: \href{https://doi.org/10.17605/OSF.IO/U7M6H}{10.17605/OSF.IO/U7M6H} and \href{https://doi.org/10.17605/OSF.IO/S7WHX}{10.17605/OSF.IO/S7WHX}, 2026.
+\bibitem{jacobson1995} T. Jacobson, ``Thermodynamics of Spacetime: The Einstein Equation of State,'' \textit{Physical Review Letters}, vol.~75, no.~7, pp.~1260--1263, 1995.
+\bibitem{rt2006} S. Ryu and T. Takayanagi, ``Holographic Derivation of Entanglement Entropy from AdS/CFT,'' \textit{Physical Review Letters}, vol.~96, no.~18, 181602, 2006.
+\bibitem{hrt2007} V. E. Hubeny, M. Rangamani, and T. Takayanagi, ``A Covariant Holographic Entanglement Entropy Proposal,'' \textit{Journal of High Energy Physics}, vol.~2007, no.~07, 062, 2007.
+\bibitem{bousso1999} R. Bousso, ``A Covariant Entropy Conjecture,'' \textit{Journal of High Energy Physics}, vol.~1999, no.~07, 004, 1999.
+\bibitem{kuznetsov2004} Y. A. Kuznetsov, \textit{Elements of Applied Bifurcation Theory}, 3rd ed., Springer, New York, 2004.
+\end{thebibliography}
 
 \end{document}
