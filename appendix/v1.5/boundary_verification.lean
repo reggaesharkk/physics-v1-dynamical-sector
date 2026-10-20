@@ -153,6 +153,13 @@ theorem dHobs_dt_le_M_H
   have h4 : 0 ≤ I_erase * Real.tanh (s.H_obs / epsH) := mul_nonneg hIe htanh_nonneg
   linarith
 
+/-- Note on `Real.tanh` bounds in Theorems 4, 6, and 7:
+For `H_max > 0`, `s.I_dot ≥ 0`, and `epsH, epsI > 0`, the inequalities
+`0 < Real.tanh (H_max / epsH)` and `0 ≤ Real.tanh (s.I_dot / epsI) ≤ 1` hold
+automatically on `[0, ∞)` (via `Real.tanh_pos_of_pos`, `Real.tanh_nonneg`, and
+`le_of_lt (Real.tanh_lt_one _)`). Passing them as explicit hypotheses keeps the
+algebraic Nagumo certificate self-contained across Mathlib versions. -/
+
 /-- Theorem 6 (Face 6 — Upper İ-Ceiling Confinement):
 At the upper processing ceiling `s.I_dot = I_dot_max`, since `e ≥ 0`, `g > 0`,
 `0 ≤ tanh(s.I_dot / epsI) ≤ 1`, and `dHobs_dt ≤ M_H`, the processing velocity is
