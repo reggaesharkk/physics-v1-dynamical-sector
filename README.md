@@ -6,10 +6,10 @@
 ## October 2026 Update: Appendix A v1.5 Release
 * **Gate 0 Closed:** Baseline independence loophole resolved via Ryu-Takayanagi relation.
 * **Global Boundary Confinement:** Multiplicative soft-wall filters stabilize the subcritical Hopf bifurcation engine.
-* **Citable Archive DOI:** https://doi.org/10.5281/zenodo.23497142
+* **Lean 4 Formal Verification Kernel:** Added computer-checked proof certifying positive orthant forward invariance.
+* **Citable Archive DOI (v1.5-Lean):** https://doi.org/10.5281/zenodo.23501526
 
 ## Repository navigation
-* appendix/v1.5/ — Active release containing typeset manuscript and verification tools
+* appendix/v1.5/ — Active release containing typeset manuscript, .lean proof kernels, and verification tools
 * appendix/v1.4/ — Frozen theorem release
 * analysis/ — Dynamical-sector analysis code
-*   **Lean 4 Formal Verification:** The oundary_verification.lean kernel formally checks and machine-certifies the forward-invariance stability bounds of the positive orthant.
