@@ -9,10 +9,10 @@ import Mathlib.Tactic
 
 This Lean 4 module formalizes the upgraded soft-wall dynamical vector field
 `F = (dgamma_dt, dHobs_dt, dIdot_dt)` of Appendix A v1.5 and provides complete,
-machine-checked proofs (with zero `sorry` axioms) of the Nagumo subtangentiality
-(inward-pointing vector field) conditions across all three lower faces of the
-positive orthant `ℝ³₊ = {s | 0 ≤ s.gamma ∧ 0 ≤ s.H_obs ∧ 0 ≤ s.I_dot}` AND all
-three upper ceiling faces (`gamma = gamma_max`, `H_obs = H_max`, `I_dot = I_dot_max`)
+machine-checked proofs (with zero `sorry` axioms and zero `nlinarith` heuristics)
+of the Nagumo subtangentiality (inward-pointing vector field) conditions across
+all three lower faces of the positive orthant `ℝ³₊ = {s | 0 ≤ s.gamma ∧ 0 ≤ s.H_obs ∧ 0 ≤ s.I_dot}`
+AND all three upper ceiling faces (`gamma = gamma_max`, `H_obs = H_max`, `I_dot = I_dot_max`)
 of the compact trapping box `B = [0, gamma_max] × [0, H_max] × [0, I_dot_max]`.
 -/
 
@@ -103,8 +103,8 @@ theorem dHobs_dt_nonneg_at_boundary
 /-- Theorem 4 (Face 4 — Upper H_obs-Ceiling Confinement):
 At the entropy saturation ceiling `s.H_obs = H_max`, the production term
 `c * s.gamma * (H_max - H_max)` vanishes identically. For `I_erase > 0` and
-positive gate activation `0 < Real.tanh (H_max / epsH)` (which holds whenever
-`H_max > 0` and `epsH > 0`), the velocity is strictly inward: `dHobs_dt < 0`. -/
+positive gate activation `0 < Real.tanh (H_max / epsH)`, the velocity is
+strictly inward: `dHobs_dt < 0`. -/
 theorem dHobs_dt_neg_at_ceiling
     (c H_max I_erase epsH : ℝ)
     (hIe : 0 < I_erase) (htanh : 0 < Real.tanh (H_max / epsH))
@@ -129,28 +129,36 @@ theorem dIdot_dt_pos_at_boundary
   exact mul_pos hf hP
 
 /-- Lemma 6a (Entropy-Rate Upper Bound on the Compact Box):
-For any state `s` in the box `0 ≤ s.gamma ≤ gamma_max` and `0 ≤ s.H_obs ≤ H_max`
-with non-negative erasure gate `0 ≤ I_erase * Real.tanh (s.H_obs / epsH)` and `0 ≤ I_erase`,
-the entropy derivative satisfies `dHobs_dt ≤ M_H`. -/
+For any state `s` in the box `0 ≤ s.gamma ≤ gamma_max` and `0 ≤ s.H_obs`
+with non-negative erasure gate `0 ≤ Real.tanh (s.H_obs / epsH)` and `0 ≤ I_erase`,
+the entropy derivative satisfies `dHobs_dt ≤ M_H`.
+Proved via explicit two-step `mul_le_mul_of_nonneg_left` / `mul_le_mul_of_nonneg_right`
+without `nlinarith`. -/
 theorem dHobs_dt_le_M_H
     (c gamma_max H_max I_erase epsH : ℝ)
     (hc : 0 ≤ c) (hHmax : 0 ≤ H_max) (hIe : 0 ≤ I_erase)
     (s : CosmologicalState)
-    (hgamma_le : s.gamma ≤ gamma_max) (hH_nonneg : 0 ≤ s.H_obs)
+    (hgamma_nonneg : 0 ≤ s.gamma) (hgamma_le : s.gamma ≤ gamma_max)
+    (hH_nonneg : 0 ≤ s.H_obs)
     (htanh_nonneg : 0 ≤ Real.tanh (s.H_obs / epsH)) :
     dHobs_dt c H_max I_erase epsH s ≤ M_H c gamma_max H_max I_erase := by
   unfold dHobs_dt M_H
+  have hc_gamma_nonneg : 0 ≤ c * s.gamma := mul_nonneg hc hgamma_nonneg
   have h1 : H_max - s.H_obs ≤ H_max := sub_le_self H_max hH_nonneg
+  have h_step1 : c * s.gamma * (H_max - s.H_obs) ≤ c * s.gamma * H_max :=
+    mul_le_mul_of_nonneg_left h1 hc_gamma_nonneg
   have h2 : c * s.gamma ≤ c * gamma_max := mul_le_mul_of_nonneg_left hgamma_le hc
-  have h3 : c * s.gamma * (H_max - s.H_obs) ≤ c * gamma_max * H_max := by
-    nlinarith [mul_nonneg hc hHmax]
+  have h_step2 : c * s.gamma * H_max ≤ c * gamma_max * H_max :=
+    mul_le_mul_of_nonneg_right h2 hHmax
   have h4 : 0 ≤ I_erase * Real.tanh (s.H_obs / epsH) := mul_nonneg hIe htanh_nonneg
   linarith
 
 /-- Theorem 6 (Face 6 — Upper İ-Ceiling Confinement):
 At the upper processing ceiling `s.I_dot = I_dot_max`, since `e ≥ 0`, `g > 0`,
 `0 ≤ tanh(s.I_dot / epsI) ≤ 1`, and `dHobs_dt ≤ M_H`, the processing velocity is
-non-positive (`dIdot_dt ≤ 0`), preventing escape through the top of the box `B`. -/
+non-positive (`dIdot_dt ≤ 0`), preventing escape through the top of the box `B`.
+Proved via explicit `mul_le_mul_of_nonneg_left` / `mul_le_mul_of_nonneg_right`
+and `mul_assoc` without `nlinarith`. -/
 theorem dIdot_dt_nonpos_at_ceiling
     (e f g P_input c gamma_max H_max I_erase epsH epsI : ℝ)
     (he : 0 ≤ e) (hg : 0 < g) (hMH : 0 ≤ M_H c gamma_max H_max I_erase)
@@ -165,10 +173,26 @@ theorem dIdot_dt_nonpos_at_ceiling
   have h_g_mul : g * s.I_dot = e * M_H c gamma_max H_max I_erase + f * P_input := by
     rw [hI]
     exact mul_div_cancel₀ (e * M_H c gamma_max H_max I_erase + f * P_input) hg_ne
-  have h_gate_bound :
-      e * Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s ≤
-      e * M_H c gamma_max H_max I_erase := by
-    nlinarith
+  have h_step1 :
+      Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s ≤
+      Real.tanh (s.I_dot / epsI) * M_H c gamma_max H_max I_erase :=
+    mul_le_mul_of_nonneg_left hdH htanh_nonneg
+  have h_step2 :
+      Real.tanh (s.I_dot / epsI) * M_H c gamma_max H_max I_erase ≤
+      1 * M_H c gamma_max H_max I_erase :=
+    mul_le_mul_of_nonneg_right htanh_le_one hMH
+  have h_step3 :
+      Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s ≤
+      M_H c gamma_max H_max I_erase := by
+    linarith
+  have h_step4 :
+      e * (Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s) ≤
+      e * M_H c gamma_max H_max I_erase :=
+    mul_le_mul_of_nonneg_left h_step3 he
+  have h_assoc :
+      e * Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s =
+      e * (Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s) :=
+    mul_assoc e (Real.tanh (s.I_dot / epsI)) (dHobs_dt c H_max I_erase epsH s)
   linarith
 
 /-- Theorem 7 (Complete 6-Face Compact-Box Nagumo Invariance Certificate):

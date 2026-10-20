@@ -44,8 +44,8 @@ python3 launch_sandbox.py
 
 | File | SHA-256 |
 | :--- | :--- |
-| `Physics_v1_5_Appendix_A.pdf` | `b3c13ea6b2ecd933e8423bb7314c914ce6150240fc0e173bf18badd4350afdc9` |
-| `appendix_a_v1_5.tex` | `b8e6a631ec41d286b7c657146dde1dec6e7f32f50ae836379fc1ad9dd209fdea` |
-| `boundary_verification.lean` | `19f16e30a18491e206cde7bebc4e96e60e3681c77d32605d6ca2c866903255ad` |
-| `verification_patch_v1_5.py` | `b91a31d50cf618d43971cff8e0d4570edc44c2bbd4d802db0becaae03ab45a90` |
+| `Physics_v1_5_Appendix_A.pdf` | `12675534ae4bb9077fcafa0fd5f347098ae36fbbe5e1d4c2388d61a4217f360c` |
+| `appendix_a_v1_5.tex` | `2d70e7b33afa64f228113db505c2d322e4e5af64e86aac9b1f91851f74012d4c` |
+| `boundary_verification.lean` | `86aef99a21123a61618279ad0e8d7f23feec0042aa3c9737876a7ee0f4ac6215` |
+| `verification_patch_v1_5.py` | `7f2d5c099df1ff39770b0eb60dfeb95a07dac9d919f072e9dd5130e9de088a14` |
 | `launch_sandbox.py` | `ab044a634a20805a6b5bd97b15f32fde7dfac84d100c38623de20f02cd908f07` |

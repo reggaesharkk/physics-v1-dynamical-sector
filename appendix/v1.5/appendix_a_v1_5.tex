@@ -5,6 +5,7 @@
 \usepackage{amsmath,amssymb,amsthm,mathtools}
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{caption}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{listings}
@@ -64,7 +65,7 @@
     {\LARGE\bfseries Appendix A v1.5: Positivity-Preserving Phase-Space Confinement, Compact Trapping Box Theorem, and Conditional Holographic Closure}\\[8pt]
     {\large Supplementary Artifact v1.5 (Upgraded Edition) --- Additive to \textit{Physics v1.0} and Appendices A v1.1--v1.4.1}\\[8pt]
     {\normalsize \textbf{Prince Upadhyay}}\\
-    {\small Independent Researcher $\cdot$ Email: \href{mailto:starxshark@gmail.com}{starxshark@gmail.com}}\\
+    {\small Independent Researcher $\cdot$ Email: [starxshark@gmail.com]}\\
     {\small October 20, 2026 $\cdot$ Zenodo Archive DOIs: \href{https://doi.org/10.5281/zenodo.23497142}{10.5281/zenodo.23497142} $\cdot$ \href{https://doi.org/10.5281/zenodo.23501526}{10.5281/zenodo.23501526}}
 \end{center}
 
@@ -75,7 +76,7 @@
 
 \section{Lineage Provenance and Epistemic Scope}
 
-Under the immutability rules of the \textit{Physics v1.0} research lineage (\href{https://doi.org/10.17605/OSF.IO/N3DQU}{10.17605/OSF.IO/N3DQU}), the original unregularized ODE ansatz analyzed in Appendix~A v1.1 and the exact symbolic positivity certificate of Appendix~A v1.4/v1.4.1 (\href{https://doi.org/10.17605/OSF.IO/U7M6H}{10.17605/OSF.IO/U7M6H}, \href{https://doi.org/10.17605/OSF.IO/S7WHX}{10.17605/OSF.IO/S7WHX}) remain frozen and unmodified. Specifically, Appendix~A v1.1 identified two minimal options to address the finite-time escape to $\gamma < 0$ across the Hopf boundary $e = e_c$:
+Under the immutability rules of the \textit{Physics v1.0} research lineage ([10.17605/OSF.IO/N3DQU]), the original unregularized ODE ansatz analyzed in Appendix~A v1.1 and the exact symbolic positivity certificate of Appendix~A v1.4/v1.4.1 (\href{https://doi.org/10.17605/OSF.IO/U7M6H}{10.17605/OSF.IO/U7M6H}, \href{https://doi.org/10.17605/OSF.IO/S7WHX}{10.17605/OSF.IO/S7WHX}) remain frozen and unmodified. Specifically, Appendix~A v1.1 identified two minimal options to address the finite-time escape to $\gamma < 0$ across the Hopf boundary $e = e_c$:
 \begin{enumerate}
 \setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}
     \item Restrict the admissible parameter domain to the linearly stable regime $e < e_c$ with the erasure admissibility bound $\dot{I}_{\text{erase}} \le c\gamma^* H_{\max}$ enforced; or
@@ -199,10 +200,25 @@ theorem dIdot_dt_nonpos_at_ceiling
   have h_g_mul : g * s.I_dot = e * M_H c gamma_max H_max I_erase + f * P_input := by
     rw [hI]
     exact mul_div_cancel0 (e * M_H c gamma_max H_max I_erase + f * P_input) hg_ne
-  have h_gate_bound :
-      e * Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s (*@$\le$@*)
-      e * M_H c gamma_max H_max I_erase := by
-    nlinarith
+  have h_step1 :
+      Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s (*@$\le$@*)
+      Real.tanh (s.I_dot / epsI) * M_H c gamma_max H_max I_erase :=
+    mul_le_mul_of_nonneg_left hdH htanh_nonneg
+  have h_step2 :
+      Real.tanh (s.I_dot / epsI) * M_H c gamma_max H_max I_erase (*@$\le$@*)
+      1 * M_H c gamma_max H_max I_erase :=
+    mul_le_mul_of_nonneg_right htanh_le_one hMH
+  have h_step3 :
+      Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s (*@$\le$@*)
+      M_H c gamma_max H_max I_erase := by linarith
+  have h_step4 :
+      e * (Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s) (*@$\le$@*)
+      e * M_H c gamma_max H_max I_erase :=
+    mul_le_mul_of_nonneg_left h_step3 he
+  have h_assoc :
+      e * Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s =
+      e * (Real.tanh (s.I_dot / epsI) * dHobs_dt c H_max I_erase epsH s) :=
+    mul_assoc e (Real.tanh (s.I_dot / epsI)) (dHobs_dt c H_max I_erase epsH s)
   linarith
 \end{lstlisting}
 
@@ -243,9 +259,8 @@ At any equilibrium $(\gamma^*, H_{\text{obs}}^*, \dot{I}^*)$ of Eqs.~\eqref{eq:v
 
 All results are verified by \texttt{verification\_patch\_v1\_5.py} using 60-digit and 750-digit \texttt{mpmath} arithmetic. Table~\ref{tab:audit50} records the multi-scale spectral and Frobenius-norm verification at the v1.3/v1.4 audit slice ($a=0.5, b=1, c=0.5, f=g=1, \mathcal{E}_{\text{avail}}=2, \mathcal{P}_{\text{input}}=1, \dot{I}_{\text{erase}}=0.5, \gamma_{\max}=1, H_{\max}=10$, with $\epsilon_H = \epsilon_I = 0.01$). Table~\ref{tab:confinement} compares the global post-Hopf behavior of the upgraded v1.5 system against the finite-time escapes of Table~2 in Appendix~A v1.1 ($a=b=c=f=g=\mathcal{E}_{\text{avail}}=1, \gamma_{\max}=10, H_{\max}=100, \mathcal{P}_{\text{input}}=5, \dot{I}_{\text{erase}}=10, \epsilon_H=\epsilon_I=0.05$).
 
-\begin{table}[ht!]
-\centering
-\caption{High-precision spectral, Frobenius-norm, and two-gate scale verification at the v1.3/v1.4 audit slice ($\epsilon_H = \epsilon_I = 0.01$).}
+\vspace{6pt}\noindent\begin{minipage}{\textwidth}\centering
+\captionof{table}{High-precision spectral, Frobenius-norm, and two-gate scale verification at the v1.3/v1.4 audit slice ($\epsilon_H = \epsilon_I = 0.01$).}
 \vspace{4pt}
 \small
 \begin{tabularx}{\textwidth}{lX}
@@ -267,11 +282,10 @@ Linear gate derivative $\partial_{\dot{I}}[e\tanh(\dot{I}/\epsilon_I)(dH_{\text{
 \bottomrule
 \end{tabularx}
 \label{tab:audit50}
-\end{table}
+\end{minipage}\vspace{6pt}
 
-\begin{table}[ht!]
-\centering
-\caption{Global post-Hopf trajectory confinement on the v1.1 benchmark ($\dot{I}_{\text{erase}}=10, e_c = 4.488095, \epsilon_H=\epsilon_I=0.05$). Every trajectory that escaped to $\gamma < 0$ in finite time under v1.0 is confined strictly inside $\mathcal{B} = [0,\gamma_{\max}]\times[0,H_{\max}]\times[0,\dot{I}_{\max}]$ under v1.5.}
+\vspace{6pt}\noindent\begin{minipage}{\textwidth}\centering
+\captionof{table}{Global post-Hopf trajectory confinement on the v1.1 benchmark ($\dot{I}_{\text{erase}}=10, e_c = 4.488095, \epsilon_H=\epsilon_I=0.05$). Every trajectory that escaped to $\gamma < 0$ in finite time under v1.0 is confined strictly inside $\mathcal{B} = [0,\gamma_{\max}]\times[0,H_{\max}]\times[0,\dot{I}_{\max}]$ under v1.5.}
 \vspace{4pt}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llcccl}
@@ -288,10 +302,10 @@ $e = 2.00\,e_c$ & Escapes: $\gamma \to 0^-$ at $t \approx 19$ & $0.002885$ & $9.
 \end{tabular}%
 }
 \label{tab:confinement}
-\end{table}
+\end{minipage}\vspace{6pt}
 
 \begin{thebibliography}{9}
-\bibitem{upadhyay_v10} P. Upadhyay, ``An Information-Theoretic Framework for Emergent Spacetime Dynamics, Horizon Thermodynamics, and Testable Cosmological Signatures,'' OSF Preprint, DOI: \href{https://doi.org/10.17605/OSF.IO/N3DQU}{10.17605/OSF.IO/N3DQU}, 2026.
+\bibitem{upadhyay_v10} P. Upadhyay, ``An Information-Theoretic Framework for Emergent Spacetime Dynamics, Horizon Thermodynamics, and Testable Cosmological Signatures,'' OSF Preprint, DOI: [10.17605/OSF.IO/N3DQU], 2026.
 \bibitem{upadhyay_v14} P. Upadhyay, ``Appendix A v1.4: Analytic Positivity Theorem and v1.4.1 Verification Patch,'' OSF Archival Records, DOIs: \href{https://doi.org/10.17605/OSF.IO/U7M6H}{10.17605/OSF.IO/U7M6H} and \href{https://doi.org/10.17605/OSF.IO/S7WHX}{10.17605/OSF.IO/S7WHX}, 2026.
 \bibitem{jacobson1995} T. Jacobson, ``Thermodynamics of Spacetime: The Einstein Equation of State,'' \textit{Physical Review Letters}, vol.~75, no.~7, pp.~1260--1263, 1995.
 \bibitem{rt2006} S. Ryu and T. Takayanagi, ``Holographic Derivation of Entanglement Entropy from AdS/CFT,'' \textit{Physical Review Letters}, vol.~96, no.~18, 181602, 2006.
