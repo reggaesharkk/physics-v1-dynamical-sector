@@ -7,7 +7,9 @@ import Mathlib.Tactic
 # Formal Verification of Positive-Orthant & Compact-Box Boundary Invariance
 ## Appendix A v1.5 — Upgraded Dynamical Sector (All 6 Faces of Compact Box `B`)
 
-This Lean 4 module formalizes the upgraded soft-wall dynamical vector field
+This Lean 4 module (`BoundaryVerification.lean` / `boundary_verification.lean`, verified via
+`lake build` under `leanprover/lean4:v4.36.0-rc1` and Mathlib commit `10156080d0e7`)
+formalizes the upgraded soft-wall dynamical vector field
 `F = (dgamma_dt, dHobs_dt, dIdot_dt)` of Appendix A v1.5 and provides complete,
 machine-checked proofs (with zero `sorry` axioms and zero `nlinarith` heuristics)
 of the Nagumo subtangentiality (inward-pointing vector field) conditions across
@@ -153,7 +155,7 @@ theorem dHobs_dt_le_M_H
   have h4 : 0 ≤ I_erase * Real.tanh (s.H_obs / epsH) := mul_nonneg hIe htanh_nonneg
   linarith
 
-/-- Note on `Real.tanh` bounds in Theorems 4, 6, and 7:
+/- Note on `Real.tanh` bounds in Theorems 4, 6, and 7:
 For `H_max > 0`, `s.I_dot ≥ 0`, and `epsH, epsI > 0`, the inequalities
 `0 < Real.tanh (H_max / epsH)` and `0 ≤ Real.tanh (s.I_dot / epsI) ≤ 1` hold
 automatically on `[0, ∞)` (via `Real.tanh_pos_of_pos`, `Real.tanh_nonneg`, and

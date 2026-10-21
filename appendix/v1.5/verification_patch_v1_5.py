@@ -744,6 +744,27 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
     }
     cert_digest = digest_object(det_cert)
 
+    import os
+    from pathlib import Path
+    base_dir = Path(__file__).resolve().parent
+    bv_upper = base_dir / "BoundaryVerification.lean"
+    bv_lower = base_dir / "boundary_verification.lean"
+    lf_path = base_dir / "lakefile.lean"
+    lm_path = base_dir / "lake-manifest.json"
+    lt_path = base_dir / "lean-toolchain"
+    if bv_upper.exists() and bv_lower.exists() and lf_path.exists() and lm_path.exists() and lt_path.exists():
+        b_up = bv_upper.read_bytes()
+        b_lo = bv_lower.read_bytes()
+        assert b_up == b_lo, "BoundaryVerification.lean and boundary_verification.lean must be byte-identical"
+        assert not b_up.startswith(b"\xef\xbb\xbf"), "UTF-8 BOM detected in Lean module"
+        assert not lf_path.read_bytes().startswith(b"\xef\xbb\xbf"), "UTF-8 BOM detected in lakefile.lean"
+        lean_text = b_up.decode("utf-8")
+        assert "sorry" not in [tok.strip(".,:;()`") for tok in lean_text.split() if tok == "sorry"], "sorry found"
+        toolchain_str = lt_path.read_text(encoding="utf-8").strip()
+        manifest_obj = json.loads(lm_path.read_text(encoding="utf-8"))
+        mathlib_rev = next((p["rev"] for p in manifest_obj.get("packages", []) if p.get("name") == "mathlib"), "")
+        print(f"Lean 4 Lake Build Manifest Audit : PASSED ({toolchain_str}, mathlib@{mathlib_rev[:12]})")
+
     print(f"VRK v0.3.1 Trust Root Anchor     : {det_cert['vrk_verifier_trust_root_digest']}")
     print(f"VRK Schema & Role Check (3/3)    : PASSED (ANALYTIC_THEOREM x2, REPRODUCED_RESULT x1)")
     print(f"Adversarial Cast Mutation Gate   : REJECTED ({detail_mut})")
