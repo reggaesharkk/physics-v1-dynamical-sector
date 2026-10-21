@@ -650,7 +650,7 @@ def run_global_confinement_and_poincare_verification():
     print(f"  Cross-solver replication (DOP853): ||y_LSODA - y_DOP853||_2 = {cross_solver_state_diff:.2e} (< 1e-6), |Delta T| = {cross_solver_period_diff:.2e} s")
     print(f"  Multi-IC convergence (3 ICs in B): max ||Delta y_IC||_2 = {multi_ic_state_diff:.2e} (certified < 1e-6), max |Delta T_IC| = {multi_ic_period_diff:.2e} s")
     print(f"  Liouville orbital div. integral  : int_0^T div F dt = {liouville_int:.2f} => det(DP) ~ 10^({log10_det_DP:.1f}) << 1")
-    print(f"  FD Floquet bound (rtol=1e-9,h=1e-3) : rho_FD(DP) = {rho_fd_std:.2e} < 1e-5 (at FD noise floor ~ rtol/(2h) ~ 10^-6)")
+    print(f"  FD Floquet bound (rtol=1e-9,h=1e-3) : rho_FD(DP) = {rho_fd_std:.2e} (Informational Noise Floor) (at FD noise floor ~ rtol/(2h) ~ 10^-6)")
     print(f"  FD Floquet bound (rtol=1e-12,h=1e-2): rho_FD(DP) = {rho_fd_tight:.2e} < 1e-8 (below FD resolution, strictly inside unit circle)")
     assert period_spread < 1e-6 and state_spread < 1e-6
     assert cross_solver_state_diff < 1e-6 and cross_solver_period_diff < 1e-6
@@ -878,7 +878,7 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
     }
     cert_digest = digest_object(det_cert)
 
-    print(f"Lean 4 Lake Manifest & AST Scan  : VALIDATED ({toolchain_str}, mathlib@{mathlib_rev[:12]}, 9/9 theorems, 0 sorry/nlinarith)")
+    print(f"Lean 4 Lake Manifest & Text Search Scan  : VALIDATED ({toolchain_str}, mathlib@{mathlib_rev[:12]}, 9/9 theorems, 0 sorry/nlinarith)")
     print(f"VRK v0.3.1 Trust Root Anchor     : {det_cert['vrk_verifier_trust_root_digest']}")
     print("VRK Claim & On-Disk Manifest (4) : SCHEMA_AND_MANIFEST_VALIDATED (ANALYTIC_THEOREM x2, REPRODUCED_RESULT x2)")
     print(f"Adversarial Cast Mutation Gate   : REJECTED (REPRODUCED_RESULT -> ANALYTIC_THEOREM: {detail_mut})")
