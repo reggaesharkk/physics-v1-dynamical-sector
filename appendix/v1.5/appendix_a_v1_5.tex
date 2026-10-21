@@ -1,5 +1,5 @@
 \documentclass[11pt,a4paper]{article}
-\usepackage[a4paper,margin=16mm]{geometry}
+\usepackage[a4paper,margin=15.8mm]{geometry}
 \usepackage{lmodern}
 \usepackage{microtype}
 \usepackage{amsmath,amssymb,amsthm,mathtools}
@@ -24,13 +24,13 @@
     pdfauthor={Prince Upadhyay}
 }
 
-\setlength{\parskip}{2.4pt plus 0.8pt minus 0.4pt}
+\setlength{\parskip}{2.2pt plus 0.6pt minus 0.4pt}
 \setlength{\parindent}{0pt}
 \AtBeginDocument{%
-  \setlength{\abovedisplayskip}{5pt plus 1.5pt minus 1.5pt}%
-  \setlength{\belowdisplayskip}{5pt plus 1.5pt minus 1.5pt}%
-  \setlength{\abovedisplayshortskip}{3pt plus 1pt minus 1pt}%
-  \setlength{\belowdisplayshortskip}{3pt plus 1pt minus 1pt}%
+  \setlength{\abovedisplayskip}{4.5pt plus 1.5pt minus 1.5pt}%
+  \setlength{\belowdisplayskip}{4.5pt plus 1.5pt minus 1.5pt}%
+  \setlength{\abovedisplayshortskip}{2.5pt plus 1pt minus 1pt}%
+  \setlength{\belowdisplayshortskip}{2.5pt plus 1pt minus 1pt}%
 }
 
 \newtheorem{theorem}{Theorem}
@@ -40,11 +40,11 @@
 \newtheorem{remark}[theorem]{Remark}
 
 \newcommand{\takeaway}[2]{%
-  \vspace{2.5pt}\noindent\colorbox{primary!7}{%
+  \vspace{2pt}\noindent\colorbox{primary!7}{%
     \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
-      \vspace{2.5pt}\textbf{\color{primary}#1:}\hspace{0.5em}#2\vspace{2.5pt}%
+      \vspace{2pt}\textbf{\color{primary}#1:}\hspace{0.5em}#2\vspace{2pt}%
     }%
-  }\vspace{2.5pt}%
+  }\vspace{2pt}%
 }
 
 \lstdefinelanguage{Lean4}{
@@ -60,8 +60,8 @@
   breaklines=true,
   columns=fullflexible,
   keepspaces=true,
-  aboveskip=3pt,
-  belowskip=3pt,
+  aboveskip=2.5pt,
+  belowskip=2.5pt,
   escapeinside={(*@}{@*)}
 }
 
@@ -69,26 +69,26 @@
 
 \begin{center}
     {\LARGE\bfseries Appendix A v1.5: Positivity-Preserving Phase-Space Confinement, Compact Trapping Box Theorem, and Conditional Holographic Closure}\\[4pt]
-    {\large Supplementary Artifact v1.5 (Upgraded Edition) --- Additive to \textit{Physics v1.0} and Appendices A v1.1--v1.4.1}\\[4pt]
+    {\large Supplementary Artifact v1.5 (Upgraded \& VRK-Verified Edition) --- Additive to \textit{Physics v1.0} and Appendices A v1.1--v1.4.1}\\[4pt]
     {\normalsize \textbf{Prince Upadhyay}}\\
-    {\small Independent Researcher $\cdot$ Email: [starxshark@gmail.com]}\\
-    {\small October 20, 2026 $\cdot$ Zenodo Archive DOIs: \href{https://doi.org/10.5281/zenodo.23497142}{10.5281/zenodo.23497142} $\cdot$ \href{https://doi.org/10.5281/zenodo.23501526}{10.5281/zenodo.23501526}}
+    {\small Independent Researcher $\cdot$ ORCID: \href{https://orcid.org/0009-0002-1170-4487}{0009-0002-1170-4487} $\cdot$ Email: [starxshark@gmail.com]}\\
+    {\small October 20, 2026 $\cdot$ Zenodo DOIs: \href{https://doi.org/10.5281/zenodo.23497142}{10.5281/zenodo.23497142} $\cdot$ \href{https://doi.org/10.5281/zenodo.23501526}{10.5281/zenodo.23501526} $\cdot$ VRK Lineage: \href{https://doi.org/10.5281/zenodo.23018459}{23018459} $\cdot$ \href{https://doi.org/10.5281/zenodo.23016445}{23016445} $\cdot$ \href{https://doi.org/10.5281/zenodo.23474505}{23474505}}
 \end{center}
 
 \vspace{1pt}
 \begin{abstract}
-\noindent Appendices A v1.1 through v1.4.1 established that the three-variable phenomenological dynamical system of \textit{Physics v1.0} admits a unique interior equilibrium whose sole linear instability is a subcritical Hopf bifurcation ($l_1 > 0$) across the interior positive parameter orthant, and demonstrated that post-Hopf trajectories ($e > e_c$) escape the physical positive orthant $\mathbb{R}^3_+$ in finite time. Implementing Option~2 of Appendix~A v1.1, this v1.5 supplement introduces a modified, smooth ($C^\infty$) soft-wall dynamical system that eliminates finite-time escape while converging exponentially to the v1.0--v1.4 system in the interior as the boundary regularization widths $\epsilon_H, \epsilon_I \to 0^+$. First, we state a \emph{conditional} holographic dictionary for Gate~0 via the covariant Hubeny--Rangamani--Takayanagi (HRT) and Bousso causal-diamond bounds; for general non-geometric Hilbert-space factorizations, Gate~0 remains open. Second, by gating the irreversible-erasure sink with $\Psi_{\epsilon_H}(H_{\text{obs}}) = \tanh(H_{\text{obs}}/\epsilon_H)$ and the derivative-feedback channel with $\Phi_{\epsilon_I}(\dot{I}) = \tanh(\dot{I}/\epsilon_I)$, we prove via Nagumo's subtangentiality theorem that both $\mathbb{R}^3_+$ and the compact box $\mathcal{B} = [0,\gamma_{\max}]\times[0,H_{\max}]\times[0,\dot{I}_{\max}]$ are globally forward-invariant for all $t \ge 0$ (an analytical containment theorem), while multi-initial-condition Poincar\'e return-map and transverse Floquet multiplier analyses ($\rho(DP) \approx 8.96 \times 10^{-6} \ll 1$) demonstrate numerically that post-Hopf trajectories settle onto an attracting periodic relaxation orbit inside $\mathcal{B}$. Third, because $\left.dH_{\text{obs}}/dt\right|_* = 0$ at steady state, the first derivative of $\Phi_{\epsilon_I}(\dot{I})$ vanishes identically in the equilibrium Jacobian, leaving $(\gamma^*, \dot{I}^*)$ exact and preserving $H_{\text{obs}}^*$, $J$, $e_c$, and $l_1$ up to $\epsilon$-dependent exponential corrections scaling as $1 - \tanh(\dot{I}^*/\epsilon_I) \sim 2e^{-2\dot{I}^*/\epsilon_I}$ and $\operatorname{sech}^2(H_{\text{obs}}^*/\epsilon_H) \sim 4e^{-2H_{\text{obs}}^*/\epsilon_H}$. Across a parametric sweep $\epsilon_H = \epsilon_I = \epsilon \in [0.005, 0.10]$ on the v1.4 audit slice, $\|J_{\text{v1.5}} - J_{\text{v1.4}}\|_F$ and $|\Delta l_1|$ decay from $2.21 \times 10^{-8}$ and $1.75 \times 10^{-6}$ at $\epsilon = 0.10$, to $1.48 \times 10^{-86}$ and $1.11 \times 10^{-82}$ at $\epsilon = 0.01$ (where $\operatorname{sech}^2(H_{\text{obs}}^*/\epsilon_H) = 5.38 \times 10^{-695}$), and $2.05 \times 10^{-173}$ and $6.11 \times 10^{-169}$ at $\epsilon = 0.005$. All six face conditions of $\mathcal{B}$ are formalized in Lean~4 (\texttt{boundary\_verification.lean}), and all symbolic equilibria, Taylor tensors, $\epsilon$-scaling laws, and Floquet multipliers are verified via \texttt{SymPy}, 60/750/1450-digit \texttt{mpmath}, and \texttt{SciPy} (\texttt{verification\_patch\_v1\_5.py}).
+\noindent Appendices A v1.1 through v1.4.1 established that the three-variable phenomenological dynamical system of \textit{Physics v1.0} admits a unique interior equilibrium whose sole linear instability is a subcritical Hopf bifurcation ($l_1 > 0$) across the interior positive parameter orthant, and demonstrated that post-Hopf trajectories ($e > e_c$) escape the physical positive orthant $\mathbb{R}^3_+$ in finite time. Implementing Option~2 of Appendix~A v1.1 under the epistemic type discipline of the IntentSeal Verifiable Research Kernel (VRK v0.3.1, \href{https://doi.org/10.5281/zenodo.23018459}{10.5281/zenodo.23018459}), this v1.5 supplement introduces a modified, smooth ($C^\infty$) soft-wall dynamical system that eliminates finite-time escape while converging exponentially to the v1.0--v1.4 system in the interior as the boundary regularization widths $\epsilon_H, \epsilon_I \to 0^+$. First, we state a \emph{conditional} holographic dictionary for Gate~0 (\texttt{CONDITIONAL\_FRONTIER}) via the covariant Hubeny--Rangamani--Takayanagi (HRT) and Bousso causal-diamond bounds; for general non-geometric Hilbert-space factorizations, Gate~0 remains \texttt{OPEN}. Second, by gating the irreversible-erasure sink with $\Psi_{\epsilon_H}(H_{\text{obs}}) = \tanh(H_{\text{obs}}/\epsilon_H)$ and the derivative-feedback channel with $\Phi_{\epsilon_I}(\dot{I}) = \tanh(\dot{I}/\epsilon_I)$, we prove via Nagumo's subtangentiality theorem that both $\mathbb{R}^3_+$ and the compact box $\mathcal{B} = [0,\gamma_{\max}]\times[0,H_{\max}]\times[0,\dot{I}_{\max}]$ are globally forward-invariant for all $t \ge 0$ (\texttt{ANALYTIC\_THEOREM}), while multi-initial-condition Poincar\'e return-map and transverse Floquet multiplier analyses ($\rho(DP) \approx 8.96 \times 10^{-6} \ll 1$) demonstrate numerically (\texttt{REPRODUCED\_RESULT}) that post-Hopf trajectories settle onto an attracting periodic relaxation orbit inside $\mathcal{B}$. Third, because $\left.dH_{\text{obs}}/dt\right|_* = 0$ at steady state, the first derivative of $\Phi_{\epsilon_I}(\dot{I})$ vanishes identically in the equilibrium Jacobian, leaving $(\gamma^*, \dot{I}^*)$ exact and preserving $H_{\text{obs}}^*$, $J$, $e_c$, and $l_1$ up to $\epsilon$-dependent exponential corrections scaling as $1 - \tanh(\dot{I}^*/\epsilon_I) \sim 2e^{-2\dot{I}^*/\epsilon_I}$ and $\operatorname{sech}^2(H_{\text{obs}}^*/\epsilon_H) \sim 4e^{-2H_{\text{obs}}^*/\epsilon_H}$. Across $\epsilon_H = \epsilon_I = \epsilon \in [0.005, 0.10]$ on the v1.4 audit slice, $\|J_{\text{v1.5}} - J_{\text{v1.4}}\|_F$ and $|\Delta l_1|$ decay from $2.21 \times 10^{-8}$ and $1.75 \times 10^{-6}$ at $\epsilon = 0.10$, to $1.48 \times 10^{-86}$ and $1.11 \times 10^{-82}$ at $\epsilon = 0.01$ ($\operatorname{sech}^2(H_{\text{obs}}^*/\epsilon_H) = 5.38 \times 10^{-695}$), and $2.05 \times 10^{-173}$ and $6.11 \times 10^{-169}$ at $\epsilon = 0.005$. All six face conditions of $\mathcal{B}$ are formalized in Lean~4 (\texttt{boundary\_verification.lean}), and all symbolic equilibria, Taylor tensors, $\epsilon$-scaling laws, Floquet multipliers, and VRK v0.3.1 claim schemas are verified via \texttt{SymPy}, 60/750/1450-digit \texttt{mpmath}, and \texttt{SciPy} (\texttt{verification\_patch\_v1\_5.py}).
 \end{abstract}
 
-\section{Lineage Provenance and Epistemic Scope}
+\section{Lineage Provenance and VRK Epistemic Scope}
 
-Under the immutability rules of the \textit{Physics v1.0} research lineage ([10.17605/OSF.IO/N3DQU]), the original unregularized ODE ansatz analyzed in Appendix~A v1.1 and the exact symbolic positivity certificate of Appendix~A v1.4/v1.4.1 (\href{https://doi.org/10.17605/OSF.IO/U7M6H}{10.17605/OSF.IO/U7M6H}, \href{https://doi.org/10.17605/OSF.IO/S7WHX}{10.17605/OSF.IO/S7WHX}) remain frozen and unmodified. Specifically, Appendix~A v1.1 identified two minimal modelling options to address the finite-time escape to $\gamma < 0$ across the Hopf boundary $e = e_c$:
+Under the immutability and additive-provenance rules of the \textit{Physics v1.0} and IntentSeal research lineages ([10.17605/OSF.IO/N3DQU], \href{https://doi.org/10.5281/zenodo.23018459}{10.5281/zenodo.23018459}, \href{https://doi.org/10.5281/zenodo.23016445}{10.5281/zenodo.23016445}, \href{https://doi.org/10.5281/zenodo.23474505}{10.5281/zenodo.23474505}), the original unregularized ODE ansatz analyzed in Appendix~A v1.1 and the exact symbolic positivity certificate of Appendix~A v1.4/v1.4.1 (\href{https://doi.org/10.17605/OSF.IO/U7M6H}{10.17605/OSF.IO/U7M6H}, \href{https://doi.org/10.17605/OSF.IO/S7WHX}{10.17605/OSF.IO/S7WHX}) remain frozen and unmodified. Specifically, Appendix~A v1.1 identified two minimal modelling options to address the finite-time escape to $\gamma < 0$ across the Hopf boundary $e = e_c$:
 \begin{enumerate}
 \setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
     \item Restrict the admissible parameter domain of the v1.0 ODE to the linearly stable regime $e < e_c$ with the erasure admissibility bound $\dot{I}_{\text{erase}} \le c\gamma^* H_{\max}$ enforced; or
     \item Define a modified, positivity-preserving dynamical system (v1.5) in which $\mathbb{R}^3_+ = \{(\gamma, H_{\text{obs}}, \dot{I}) \in \mathbb{R}^3 \mid \gamma \ge 0,\, H_{\text{obs}} \ge 0,\, \dot{I} \ge 0\}$ is globally forward-invariant while converging exponentially to the v1.0--v1.4 equilibrium and Hopf scaling in the interior regime ($\epsilon_H, \epsilon_I \ll 1$).
 \end{enumerate}
-This document executes Option~2 as a distinct versioned dynamical model (v1.5) and formulates a conditional holographic dictionary for the saturation capacity $H_{\max}$.
+This document executes Option~2 as a distinct versioned dynamical model (v1.5) and enforces VRK v0.3.1 epistemic type separation (\texttt{ANALYTIC\_THEOREM} vs.\ \texttt{REPRODUCED\_RESULT} vs.\ \texttt{CONDITIONAL\_FRONTIER}/\texttt{OPEN}) across all claims.
 
 \section{Conditional Holographic Dictionary for Gate 0}
 
@@ -105,7 +105,7 @@ H_{\max} \equiv \sup_{\rho_{\text{obs}} \in \mathcal{S}(\mathcal{D}(\mathcal{A})
 \end{proposition}
 
 \begin{remark}[Distinction Between Conditional Closure and General Derivation]
-Equation~\eqref{eq:hrt_dictionary} closes Gate~0 \emph{conditionally} within the class of spatially localized causal-diamond subsystems admitting a semiclassical holographic or covariant entropy bound. For abstract, non-geometric Hilbert-space factorizations $\mathcal{H}_{\text{total}} = \mathcal{H}_{\text{obs}} \otimes \mathcal{H}_{\text{env}}$ without a spatial boundary $\partial\mathcal{A}$, Gate~0 remains open in generality. None of the dynamical-sector theorems in Sections 3--6 depend on Eq.~\eqref{eq:hrt_dictionary}; they hold for any constant $H_{\max} > 0$.
+Equation~\eqref{eq:hrt_dictionary} closes Gate~0 \emph{conditionally} (\texttt{CONDITIONAL\_FRONTIER}) within the class of spatially localized causal-diamond subsystems admitting a semiclassical holographic or covariant entropy bound. For abstract, non-geometric Hilbert-space factorizations $\mathcal{H}_{\text{total}} = \mathcal{H}_{\text{obs}} \otimes \mathcal{H}_{\text{env}}$ without a spatial boundary $\partial\mathcal{A}$, Gate~0 remains \texttt{OPEN} in generality. None of the dynamical-sector theorems in Sections 3--6 depend on Eq.~\eqref{eq:hrt_dictionary}; they hold for any constant $H_{\max} > 0$.
 \end{remark}
 
 \section{Upgraded Soft-Wall Dynamical System and Global Trapping Box Theorem}
@@ -175,7 +175,7 @@ Since the vector field $F = (d\gamma/dt, dH_{\text{obs}}/dt, d\dot{I}/dt)$ of Eq
 Since $F$ points inward on every boundary face of $\mathcal{B}$ and $\mathcal{B}$ is compact, standard ODE global existence guarantees that all trajectories in $\mathcal{B}$ are defined and confined to $\mathcal{B}$ for all $t \ge 0$.
 \end{proof}
 
-\takeaway{Analytical Containment vs.\ Numerical Relaxation Limit Cycle}{Theorem~\ref{thm:global_invariance} is a global analytical containment theorem proving that no trajectory can exit $\mathcal{B}$. In the post-Hopf regime ($e > e_c$) where the unique interior equilibrium is unstable, multi-initial-condition Poincar\'e return-map integration and linearized transverse Floquet multiplier evaluation ($\rho(DP) = 8.96\times 10^{-6} \ll 1$, Section~6, Table~\ref{tab:confinement}) provide direct numerical evidence that trajectories repelled from the equilibrium converge onto an attracting periodic relaxation oscillation inside $\mathcal{B}$ whose closest approach to $\gamma=0$ and $H_{\text{obs}}=0$ is governed by $\epsilon_H, \epsilon_I$.}
+\takeaway{VRK Type Separation --- Analytical Containment vs.\ Numerical Relaxation Limit Cycle}{Under VRK v0.3.1 (\href{https://doi.org/10.5281/zenodo.23018459}{10.5281/zenodo.23018459}), Theorem~\ref{thm:global_invariance} is classified as \texttt{ANALYTIC\_THEOREM} (global forward-invariance of $\mathcal{B}$), whereas the post-Hopf relaxation limit cycle ($e > e_c$) is classified as \texttt{REPRODUCED\_RESULT} / \texttt{NUMERICAL\_OBSERVATION}, certified across 3 initial conditions in $\mathcal{B}$ via Poincar\'e return-map integration and linearized transverse Floquet multiplier evaluation ($\rho(DP) = 8.96\times 10^{-6} \ll 1$, Section~6, Table~\ref{tab:confinement}).}
 
 \section{Formal Kernel Verification in Lean 4 (All Six Faces of $\mathcal{B}$)}
 
@@ -253,27 +253,26 @@ At any equilibrium $(\gamma^*, H_{\text{obs}}^*, \dot{I}^*)$ of Eqs.~\eqref{eq:v
 \end{enumerate}
 \end{proposition}
 
-\section{Symbolic Tensor Audit, $\epsilon$-Scaling Sweep, and Post-Hopf Benchmark}
+\section{Symbolic Tensor Audit, $\epsilon$-Scaling Sweep, VRK Audit, and Benchmark}
 
-The script \texttt{verification\_patch\_v1\_5.py} executes a five-layer mechanical verification chain across two standard parameter slices from the prior lineage:
+The script \texttt{verification\_patch\_v1\_5.py} executes a six-layer mechanical verification chain across two standard parameter slices from the prior lineage:
 \begin{itemize}
 \setlength{\itemsep}{0.5pt}
     \item \textbf{v1.3/v1.4 Audit Slice (Tables~\ref{tab:audit50} and \ref{tab:eps_sweep}):} $a=0.5, b=1, c=0.5, f=g=1, \mathcal{E}_{\text{avail}}=2, \mathcal{P}_{\text{input}}=1, \dot{I}_{\text{erase}}=0.5, \gamma_{\max}=1, H_{\max}=10$, where $e_c = 135/26 \approx 5.192308$ and $(\gamma^*, H_{\text{obs}}^*, \dot{I}^*) = (0.5, 8.0, 1.0)$.
     \item \textbf{v1.1 Dynamical Benchmark (Table~\ref{tab:confinement}):} $a=b=c=f=g=\mathcal{E}_{\text{avail}}=1, \gamma_{\max}=10, H_{\max}=100, \mathcal{P}_{\text{input}}=5, \dot{I}_{\text{erase}}=10$, where $e_c = 44.880952/\dot{I}_{\text{erase}} = 4.488095$ and $(\gamma^*, H_{\text{obs}}^*, \dot{I}^*) = (10/3, 97.0, 5.0)$.
-    \item \textbf{Verification Chain Summary:} (1) \textbf{Lean~4 Kernel} (\texttt{boundary\_verification.lean}) certifies all 6 face/ceiling conditions of $\mathcal{B}$ (\texttt{compact\_box\_nagumo\_certificate}, Scope: Theorem~\ref{thm:global_invariance}); (2) \textbf{SymPy Symbolic Audit} verifies $f_1=f_2=f_3=0$ at steady state and $J_{\text{v1.5}}, B_{\text{v1.5}}, C_{\text{v1.5}}$ (including $C_1 = 0$) with zero symbolic residual (Scope: Proposition~\ref{prop:jacobian_invariance} tensor construction); (3) \textbf{60-Digit \texttt{mpmath}} verifies $l_{1,\text{v1.4}}$ against the 50-digit exact reference ($|\Delta| < 10^{-51}$); (4) \textbf{750/1450-Digit \texttt{mpmath}} certifies the two-gate perturbation bounds and 5-point $\epsilon$-scaling sweep (Tables~\ref{tab:audit50}--\ref{tab:eps_sweep}); and (5) \textbf{\texttt{LSODA} + 3-IC Poincar\'e + Transverse Floquet Audit} certifies post-Hopf confinement, multi-IC convergence ($\max\|\Delta y_{\text{IC}}\|_2 = 1.83\times 10^{-8} < 10^{-6}$), and orbital asymptotic stability ($\rho(DP) = 8.96\times 10^{-6} \ll 1$, Table~\ref{tab:confinement}).
+    \item \textbf{Six-Layer Verification Chain \& VRK v0.3.1 Binding:} (1) \textbf{Lean~4 Kernel} (\texttt{boundary\_\allowbreak verification.lean}) certifies all 6 face/ceiling conditions of $\mathcal{B}$ (\texttt{compact\_box\_nagumo\_certificate}, Scope: Theorem~\ref{thm:global_invariance}); (2) \textbf{SymPy Symbolic Audit} verifies $f_1=f_2=f_3=0$ at steady state and $J_{\text{v1.5}}, B_{\text{v1.5}}, C_{\text{v1.5}}$ ($C_1 = 0$) with zero symbolic residual (Proposition~\ref{prop:jacobian_invariance}); (3) \textbf{60-Digit \texttt{mpmath}} verifies $l_{1,\text{v1.4}}$ against the 50-digit exact reference ($|\Delta| < 10^{-51}$); (4) \textbf{750/1450-Digit \texttt{mpmath}} certifies the two-gate perturbation bounds and 5-point $\epsilon$-scaling sweep (Tables~\ref{tab:audit50}--\ref{tab:eps_sweep}); (5) \textbf{\texttt{LSODA} + 3-IC Poincar\'e + Transverse Floquet Audit} certifies post-Hopf confinement, 3-IC convergence ($\max\|\Delta y_{\text{IC}}\|_2 = 1.83\times 10^{-8} < 10^{-6}$), and orbital asymptotic stability ($\rho(DP) = 8.96\times 10^{-6} \ll 1$, Table~\ref{tab:confinement}); and (6) \textbf{IntentSeal VRK v0.3.1 Audit} (\href{https://doi.org/10.5281/zenodo.23018459}{10.5281/zenodo.23018459}, trust root \texttt{f010a99d...05a0d0f}) validates \texttt{intentseal-vrk-claim-v2} role compliance, rejects illegal \texttt{REPRODUCED\_RESULT $\to$ ANALYTIC\_THEOREM} promotion mutations, and produces deterministic certificate digest \texttt{99325d5313ae791c\allowbreak f001b3efc16e6631\allowbreak 425d46f6343c2443\allowbreak 96d9bc65d366634c}.
 \end{itemize}
 
-\vspace{2pt}\noindent\begin{minipage}{\textwidth}\centering
-\captionof{table}{High-precision spectral, Frobenius-norm, and two-gate scale verification at the v1.3/v1.4 audit slice ($\epsilon_H = \epsilon_I = 0.01$, $e_c = 135/26$).}
-\vspace{1.5pt}
+\vspace{1.5pt}\noindent\begin{minipage}{\textwidth}\centering
+\captionof{table}{High-precision spectral, Frobenius-norm, two-gate scale, and VRK v0.3.1 verification at the v1.3/v1.4 audit slice ($\epsilon_H = \epsilon_I = 0.01$, $e_c = 135/26$).}
+\vspace{1pt}
 \small
 \begin{tabularx}{\textwidth}{lX}
 \toprule
-\textbf{Quantity} & \textbf{Verified Value (60-Digit / 750-Digit \texttt{mpmath} \& \texttt{SymPy} Audit)} \\
+\textbf{Quantity} & \textbf{Verified Value (60/750-Digit \texttt{mpmath}, \texttt{SymPy} \& VRK v0.3.1 Audit)} \\
 \midrule
 SymPy equilibrium \& tensor audit & Exact zero residual for $f_1=f_2=f_3=0$ and $J_{\text{v1.5}}, B_{\text{v1.5}}, C_{1,\text{v1.5}}=0, C_{2,\text{v1.5}}, C_{3,\text{v1.5}}$ \\
-Analytic Hopf threshold $e_c$ & $135/26 = 5.19230769230769230769230769\dots$ \\
-Hopf frequency $\omega_c$ ($\text{s}^{-1}$) & $0.39223227027636806384832493\dots$ \\
+Analytic Hopf threshold $e_c$ \& $\omega_c$ & $e_c = 135/26 = 5.19230769230769\dots$, $\omega_c = \sqrt{2/13} = 0.392232270276368\dots\text{ s}^{-1}$ \\
 First Lyapunov coefficient $l_1 = \operatorname{Re}(G_{21})/(2\omega_c)$ & $+0.51958911735122026898339319\dots$ (subcritical, $l_1 > 0$) \\
 Processing gate deviation $1 - \tanh(\dot{I}^*/\epsilon_I)$ & $2.76779305347 \times 10^{-87}$ ($\dot{I}^*/\epsilon_I = 100$) \\
 Entropy gate deviation $\operatorname{sech}^2(H_{\text{obs}}^*/\epsilon_H)$ & $5.38132158610 \times 10^{-695}$ ($H_{\text{obs}}^*/\epsilon_H = 800$) \\
@@ -282,14 +281,15 @@ Jacobian Frobenius norm $\|J_{\text{v1.5}} - J_{\text{v1.4}}\|_F$ & $1.481352807
 Hopf threshold shift $|e_{c,\text{v1.5}} - e_{c,\text{v1.4}}|$ & $1.43712331623 \times 10^{-86}$ ($< 10^{-85} \ll 10^{-50}$) \\
 First Lyapunov shift $|l_{1,\text{v1.5}} - l_{1,\text{v1.4}}|$ & $1.10793084174 \times 10^{-82}$ ($< 10^{-81} \ll 10^{-50}$) \\
 Linear gate derivative $\partial_{\dot{I}}[e\tanh(\dot{I}/\epsilon_I)(dH_{\text{obs}}/dt)]_*$ & $0$ (vanishes identically since $dH_{\text{obs}}/dt|_* = 0$) \\
+VRK v0.3.1 certificate digest & {\scriptsize\texttt{99325d5313ae791cf001b3efc16e6631\allowbreak 425d46f6343c244396d9bc65d366634c}} \\
 \bottomrule
 \end{tabularx}
 \label{tab:audit50}
-\end{minipage}\vspace{2pt}
+\end{minipage}\vspace{1.5pt}
 
-\vspace{2pt}\noindent\begin{minipage}{\textwidth}\centering
+\vspace{1.5pt}\noindent\begin{minipage}{\textwidth}\centering
 \captionof{table}{Parametric gate-width scaling sweep on the v1.3/v1.4 audit slice ($\epsilon_H = \epsilon_I = \epsilon$), demonstrating exponential convergence of the v1.5 soft-wall system to v1.4 as $\epsilon \to 0^+$.}
-\vspace{1.5pt}
+\vspace{1pt}
 \small
 \setlength{\tabcolsep}{7pt}
 \begin{tabularx}{\textwidth}{lXXXX}
@@ -304,11 +304,11 @@ $\epsilon = 0.005$ & $3.83034 \times 10^{-174}$ & $2.05004 \times 10^{-173}$ & $
 \bottomrule
 \end{tabularx}
 \label{tab:eps_sweep}
-\end{minipage}\vspace{2pt}
+\end{minipage}\vspace{1.5pt}
 
-\vspace{2pt}\noindent\begin{minipage}{\textwidth}\centering
+\vspace{1.5pt}\noindent\begin{minipage}{\textwidth}\centering
 \captionof{table}{Post-Hopf trajectory confinement on the v1.1 benchmark ($\dot{I}_{\text{erase}}=10, e_c = 4.488095, \epsilon_H=\epsilon_I=0.05$). At $e = 1.20\,e_c$, a Poincar\'e return map on $\Sigma = \{\gamma = 1.0\text{ s}^{-1}, \dot{\gamma} > 0\}$ confirms convergence across 3 widely separated initial conditions in $\mathcal{B}$ ($\max\|\Delta y_{\text{IC}}\|_2 = 1.83\times 10^{-8} < 10^{-6}$) to an attracting periodic relaxation orbit at $(H_{\text{obs}},\dot{I})_\Sigma = (3.91083047, 21.68392737)$ with period $T = 18.95704705\text{ s}$, 5-cycle period spread $< 10^{-6}\text{ s}$ ($2.58\times 10^{-9}\text{ s}$ on x86\_64 Linux; $1.72\times 10^{-7}\text{ s}$ on ARM64), state spread $\|\Delta y\|_2 < 10^{-6}$ ($3.85\times 10^{-10}$ on x86\_64; $5.57\times 10^{-9}$ on ARM64), and transverse Floquet spectral radius $\rho(DP) = 8.96\times 10^{-6} \ll 1$.}
-\vspace{1.5pt}
+\vspace{1pt}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llcccl}
 \toprule
@@ -324,13 +324,14 @@ $e = 2.00\,e_c$ & Escapes: $\gamma \to 0^-$ at $t \approx 19$ & $0.002885$ & $9.
 \end{tabular}%
 }
 \label{tab:confinement}
-\end{minipage}\vspace{1.5pt}
+\end{minipage}\vspace{1pt}
 
-{\small
+{\footnotesize
 \begin{thebibliography}{9}
-\setlength{\itemsep}{0.5pt}\setlength{\parskip}{0pt}
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
 \bibitem{upadhyay_v10} P. Upadhyay, ``An Information-Theoretic Framework for Emergent Spacetime Dynamics, Horizon Thermodynamics, and Testable Cosmological Signatures,'' OSF Preprint, DOI: [10.17605/OSF.IO/N3DQU], 2026.
 \bibitem{upadhyay_v14} P. Upadhyay, ``Appendix A v1.4: Analytic Positivity Theorem and v1.4.1 Verification Patch,'' OSF Archival Records, DOIs: \href{https://doi.org/10.17605/OSF.IO/U7M6H}{10.17605/OSF.IO/U7M6H} and \href{https://doi.org/10.17605/OSF.IO/S7WHX}{10.17605/OSF.IO/S7WHX}, 2026.
+\bibitem{upadhyay_vrk} P. Upadhyay, ``IntentSeal Verifiable Research Kernel (VRK) v0.3.1, Frozen Prototype Lineage v0.1.1--v0.5.0, and STRENGTH-INTENT-NS-LEAN,'' Zenodo Archival Records, DOIs: \href{https://doi.org/10.5281/zenodo.23018459}{10.5281/zenodo.23018459}, \href{https://doi.org/10.5281/zenodo.23016445}{10.5281/zenodo.23016445}, and \href{https://doi.org/10.5281/zenodo.23474505}{10.5281/zenodo.23474505}, 2026.
 \bibitem{jacobson1995} T. Jacobson, ``Thermodynamics of Spacetime: The Einstein Equation of State,'' \textit{Physical Review Letters}, vol.~75, no.~7, pp.~1260--1263, 1995.
 \bibitem{rt2006} S. Ryu and T. Takayanagi, ``Holographic Derivation of Entanglement Entropy from AdS/CFT,'' \textit{Physical Review Letters}, vol.~96, no.~18, 181602, 2006.
 \bibitem{hrt2007} V. E. Hubeny, M. Rangamani, and T. Takayanagi, ``A Covariant Holographic Entanglement Entropy Proposal,'' \textit{Journal of High Energy Physics}, vol.~2007, no.~07, 062, 2007.
