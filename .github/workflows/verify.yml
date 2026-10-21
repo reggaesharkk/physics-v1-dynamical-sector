@@ -19,7 +19,7 @@ jobs:
       uses: leanprover/lean-action@v1
       with:
         use-mathlib-cache: true
-        project-dir: 'appendix/v1.5'
+        lake-package-directory: 'appendix/v1.5'
 
     - name: Verify Lean 4 6-Face Compact-Box Certificate (BoundaryVerification.lean)
       working-directory: appendix/v1.5
