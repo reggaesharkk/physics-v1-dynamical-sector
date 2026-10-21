@@ -253,3 +253,5 @@ theorem compact_box_nagumo_certificate
       he hg hMH s hI hdH ht0 ht1
 
 end
+
+#print axioms compact_box_nagumo_certificate
