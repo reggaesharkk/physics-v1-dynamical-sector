@@ -1,37 +1,43 @@
-name: Appendix A v1.5 — Lean 4 Lake & VRK v0.3.1 Verification CI
+﻿name: Appendix A v1.5 — Lean 4 Lake & VRK v0.3.1 Verification CI
 
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   verify-lean4-and-vrk-suite:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Install elan and Lean 4 toolchain (v4.36.0-rc1)
-        uses: leanprover/lean-action@v1
-        with:
-          use-mathlib-cache: true
+    - name: Install elan and Lean 4 toolchain (v4.36.0-rc1)
+      uses: leanprover/lean-action@v1
+      with:
+        use-mathlib-cache: true
+        project-dir: 'appendix/v1.5'
 
-      - name: Verify Lean 4 6-Face Compact-Box Certificate (BoundaryVerification.lean)
-        run: |
-          lake exe cache get
-          lake build
+    - name: Verify Lean 4 6-Face Compact-Box Certificate (BoundaryVerification.lean)
+      working-directory: appendix/v1.5
+      run: |
+        lake exe cache get
+        lake build
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
 
-      - name: Install Python verification dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install mpmath numpy scipy sympy
+    - name: Install Python verification dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mpmath numpy scipy sympy
 
-      - name: Run 60/750/1450-digit Spectral, SymPy, Liouville/Floquet & VRK v0.3.1 Suite
-        run: |
-          python3 verification_patch_v1_5.py
+    - name: Run 60/750/1450-digit Spectral, SymPy, Liouville/Floquet & VRK v0.3.1 Suite
+      working-directory: appendix/v1.5
+      run: |
+        python3 verification_patch_v1_5.py
