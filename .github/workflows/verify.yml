@@ -35,7 +35,7 @@ jobs:
     - name: Install Python verification dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install mpmath numpy scipy sympy
+        pip install -r appendix/v1.5/requirements.txt
 
     - name: Run 60/750/1450-digit Spectral, SymPy, Liouville/Floquet & VRK v0.3.1 Suite
       working-directory: appendix/v1.5
