@@ -7,7 +7,7 @@ import Mathlib.Tactic
 # Formal Verification of Positive-Orthant & Compact-Box Boundary Invariance
 ## Appendix A v1.5 — Upgraded Dynamical Sector (All 6 Faces of Compact Box `B`)
 
-This Lean 4 module (`BoundaryVerification.lean` / `boundary_verification.lean`, verified via
+This Lean 4 module (`BoundaryVerification.lean`, verified via
 `lake build` under `leanprover/lean4:v4.36.0-rc1` and Mathlib commit `10156080d0e7`)
 formalizes the upgraded soft-wall dynamical vector field
 `F = (dgamma_dt, dHobs_dt, dIdot_dt)` of Appendix A v1.5 and provides complete,
@@ -179,6 +179,7 @@ theorem dIdot_dt_nonpos_at_ceiling
     dIdot_dt e f g P_input c H_max I_erase epsH epsI s ≤ 0 := by
   unfold dIdot_dt I_dot_max at *
   have hg_ne : g ≠ 0 := ne_of_gt hg
+  -- In Mathlib4 (10156080d0e7), `mul_div_cancel₀ a hb` has type `b * (a / b) = a`.
   have h_g_mul : g * s.I_dot = e * M_H c gamma_max H_max I_erase + f * P_input := by
     rw [hI]
     exact mul_div_cancel₀ (e * M_H c gamma_max H_max I_erase + f * P_input) hg_ne

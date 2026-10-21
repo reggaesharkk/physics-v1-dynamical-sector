@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 Appendix A v1.5 — High-Precision (60-Digit / 750-Digit / 1450-Digit) Algebraic, Symbolic, Spectral,
-Global Invariance & IntentSeal VRK v0.3.1 Epistemic Type-Check Verifier
+Global Invariance & IntentSeal VRK v0.3.1 Claim-Schema & Evidence-Manifest Verifier
 Author: Prince Upadhyay (Upgraded Verification Suite v1.5)
 
-This script performs six independent, non-hardcoded verifications:
+This script performs six non-hardcoded verification layers:
 1. Exact 60-digit computation of the Hopf threshold (e_c), Hopf frequency (omega_c),
    complex eigenvectors (q, p), resolvent contractions, and Kuznetsov first Lyapunov
    coefficient l1 = Re(G21)/(2*omega_c) for the unregularized v1.4 system at the
@@ -15,32 +15,38 @@ This script performs six independent, non-hardcoded verifications:
    at the interior equilibrium (eps_H = eps_I = 0.01), PLUS an independent SymPy symbolic
    equilibrium and differentiation cross-check of all 1st-, 2nd-, and 3rd-order partial
    derivatives (including f1=f2=f3=0 at steady state and C1_sym == 0, C2_sym == C2_ana,
-   C3_sym == C3_ana) of the v1.5 vector field, resolving both distinct exponential gate scales:
-   - Processing gate deviation: 1 - tanh(I_dot* / eps_I) = 2.767793e-87
-   - Entropy gate deviation   : sech^2(H_obs* / eps_H)   = 5.381322e-695
+   C3_sym == C3_ana) of the v1.5 vector field, resolving both distinct exponential gate scales
+   and cross-checking them against leading-order asymptotic perturbation estimators:
+   - Processing gate deviation: 1 - tanh(I_dot* / eps_I) = 2.767793e-87 (~ 2*exp(-2*I_dot*/eps_I))
+   - Entropy gate deviation   : sech^2(H_obs* / eps_H)   = 5.381322e-695 (~ 4*exp(-2*H_obs*/eps_H))
    - Frobenius norm deviation : ||J_v1.5 - J_v1.4||_F    = 1.481353e-86 < 10^-85 << 10^-50
    - First Lyapunov shift     : |l1_v1.5 - l1_v1.4|      = 1.107931e-82 < 10^-81 << 10^-50
 3. Parametric gate-width scaling sweep across eps_H = eps_I in {0.10, 0.05, 0.02, 0.01, 0.005},
    demonstrating exponential convergence of ||J_v1.5 - J_v1.4||_F, |Delta e_c|, and |Delta l1|.
 4. Direct numerical verification of Nagumo boundary inward-pointing conditions on all
-   six faces of the compact trapping box B = [0, gamma_max] x [0, H_max] x [0, I_max]
+   six faces of the e-dependent compact trapping box B(e) = [0, gamma_max] x [0, H_max] x [0, I_max(e)]
    and post-Hopf trajectory confinement across e / e_c in {0.90, 1.01, 1.04, 1.08, 1.20, 2.00}
    on the v1.1 benchmark parameter set.
-5. Multi-initial-condition Poincare section return-map and transverse Floquet multiplier
-   verification at e = 1.20 * e_c, confirming that trajectories from three widely separated
-   initial states in B converge to the same attracting periodic relaxation orbit with period
-   T = 18.95704705 s (5-cycle spread < 10^-6 s across x86_64/ARM64 platforms; 2.58e-9 s on
-   x86_64 Linux, 1.72e-7 s on ARM64), return-state spread ||Delta y||_2 < 10^-6 (3.85e-10
-   on x86_64 Linux, 5.57e-9 on ARM64), 3-IC spread max ||Delta y_IC||_2 = 1.83e-8 < 10^-6,
-   and transverse Floquet spectral radius rho(DP) = 8.96e-6 << 1 (strictly inside unit circle).
+5. Multi-initial-condition Poincare section return-map, cross-solver replication (LSODA Adams/BDF
+   vs. DOP853 8th-order Runge-Kutta), Liouville orbital divergence integral, and transverse Floquet
+   multiplier verification at e = 1.20 * e_c:
+   - Asymptotic section point : (H_obs, I_dot)_Sigma = (3.910830, 21.683927), period T = 18.957047 s
+   - Cross-solver replication : ||y_LSODA - y_DOP853||_2 < 10^-6, |T_LSODA - T_DOP853| < 10^-6 s
+   - 3-IC convergence in B(e) : max ||Delta y_IC||_2 < 10^-6 (< 10^-9 at rtol=10^-12), max |Delta T_IC| < 10^-6 s
+   - Liouville orbital integral: int_0^T div F(y(t)) dt = -10405.41 => det(DP) = exp(-10405.41) ~ 10^-4519 << 1
+   - Finite-diff Floquet bound: rho_FD(DP) < 10^-8 at (rtol=10^-12, atol=10^-14, step=10^-2), below the
+     finite-difference truncation noise floor (~ rtol / (2*step) ~ 10^-6 at rtol=10^-9, step=10^-3).
 6. IntentSeal Verifiable Research Kernel (VRK v0.3.1, DOI: 10.5281/zenodo.23018459; Lineage
-   DOI: 10.5281/zenodo.23016445; Ecosystem DOI: 10.5281/zenodo.23474505) epistemic type-system
-   and deterministic certificate audit, verifying `intentseal-vrk-claim-v2` role compliance,
-   fail-closed rejection of illegal `NUMERICAL_OBSERVATION -> ANALYTIC_THEOREM` casts, and
-   telemetry-free deterministic certificate hashing (`intentseal-vrk-deterministic-certificate-v2`).
+   DOI: 10.5281/zenodo.23016445; Ecosystem DOI: 10.5281/zenodo.23474505) claim-schema and
+   on-disk evidence-manifest gate (`SCHEMA_AND_MANIFEST_VALIDATED`), verifying 4 separated claims
+   (`ANALYTIC_THEOREM` x2, `REPRODUCED_RESULT` x2), inspecting referenced files and anchors on disk,
+   rejecting illegal `REPRODUCED_RESULT -> ANALYTIC_THEOREM` promotion casts, and computing the
+   telemetry-free deterministic certificate digest (`intentseal-vrk-deterministic-certificate-v2`).
 """
 import hashlib
 import json
+from pathlib import Path
+import re
 import mpmath as mp
 import numpy as np
 import sympy as sp
@@ -335,6 +341,11 @@ def evaluate_v15_softwall_metrics(eps_val_str, dps=750):
     sech2_H = mp.sech(H_sw / eps_H) ** 2
     one_minus_tanh_I = 1 - mp.tanh(I_star / eps_I)
 
+    # Independent leading-order asymptotic analytical perturbation estimators:
+    asymp_one_minus_tanh_I = 2 * mp.exp(-2 * I_star / eps_I)
+    asymp_sech2_H = 4 * mp.exp(-2 * H_star_v14 / eps_H)
+    asymp_ec_shift = e_c_v14 * asymp_one_minus_tanh_I
+
     delta_eps = c * (H_max - H_sw)
     mu_eps = c * gamma_star + (I_erase / eps_H) * sech2_H
     e_eff = e_c_v14 * mp.tanh(I_star / eps_I)
@@ -421,6 +432,9 @@ def evaluate_v15_softwall_metrics(eps_val_str, dps=750):
         "ec_shift": ec_shift,
         "l1_shift": l1_shift,
         "l1_v15": l1_v15_high,
+        "asymp_rel_err_I": abs(one_minus_tanh_I - asymp_one_minus_tanh_I) / one_minus_tanh_I,
+        "asymp_rel_err_H": abs(sech2_H - asymp_sech2_H) / sech2_H,
+        "asymp_rel_err_ec": abs(ec_shift - asymp_ec_shift) / ec_shift,
     }
 
 
@@ -438,6 +452,7 @@ def run_750_digit_softwall_jacobian_check():
     print(f"Frobenius norm ||J_v1.5 - J_v1.4||_F: {mp.nstr(res['frob_diff'], 12)}  [O(10^-86) < 10^-50]")
     print(f"Hopf threshold shift |e_c_15-e_c_14|: {mp.nstr(res['ec_shift'], 12)}  [O(10^-86) < 10^-50]")
     print(f"Lyapunov shift |l1_v1.5 - l1_v1.4| : {mp.nstr(res['l1_shift'], 12)}  [O(10^-82) < 10^-50]")
+    print(f"Asymptotic formula rel. error (e_c): {mp.nstr(res['asymp_rel_err_ec'], 6)}  (< 10^-85 vs 2*e_c*exp(-2I*/eps_I))")
     print(f"d/dI_dot [e tanh(I/eps_I) dH/dt]|_* : 0.0 (EXACT: vanishes since dH_obs/dt|_* = 0)")
 
     assert res["one_minus_tanh_I"] < mp.mpf("1e-86")
@@ -445,6 +460,7 @@ def run_750_digit_softwall_jacobian_check():
     assert res["frob_diff"] < mp.mpf("1e-85") and res["frob_diff"] < mp.mpf("1e-50")
     assert res["ec_shift"] < mp.mpf("1e-85") and res["ec_shift"] < mp.mpf("1e-50")
     assert res["l1_shift"] < mp.mpf("1e-81") and res["l1_shift"] < mp.mpf("1e-50")
+    assert res["asymp_rel_err_ec"] < mp.mpf("1e-85")
 
     print("\n" + "-" * 84)
     print("PARAMETRIC GATE-WIDTH SCALING SWEEP (AUDIT SLICE, eps_H = eps_I = eps)")
@@ -511,13 +527,13 @@ def run_global_confinement_and_poincare_verification():
     min_f5 = min(upgraded_v15_ode(0, [gm, h, 0.0], a, b, c, e_test, f, g, E_avail, P_input, I_erase, gamma_max, H_max, eps_H, eps_I)[2] for gm in g_grid for h in H_grid)
     max_f6 = max(upgraded_v15_ode(0, [gm, h, I_max_val], a, b, c, e_test, f, g, E_avail, P_input, I_erase, gamma_max, H_max, eps_H, eps_I)[2] for gm in g_grid for h in H_grid)
 
-    print(f"6-Face Nagumo Check on B = [0, {gamma_max}] x [0, {H_max}] x [0, {I_max_val:.2f}] (at e = 2.0 * e_c):")
+    print(f"6-Face Nagumo Check on B(e) = [0, {gamma_max}] x [0, {H_max}] x [0, {I_max_val:.2f}] (at e = 2.0 * e_c):")
     print(f"  Face 1 (gamma = 0)         : min(dgamma/dt) = {min_f1:+.6f} >= 0")
     print(f"  Face 2 (gamma = gamma_max) : max(dgamma/dt) = {max_f2:+.6f} <  0")
     print(f"  Face 3 (H_obs = 0)         : min(dH_obs/dt) = {min_f3:+.6f} >= 0")
     print(f"  Face 4 (H_obs = H_max)     : max(dH_obs/dt) = {max_f4:+.6f} <  0")
     print(f"  Face 5 (I_dot = 0)         : min(dI_dot/dt) = {min_f5:+.6f} >  0")
-    print(f"  Face 6 (I_dot = I_max)     : max(dI_dot/dt) = {max_f6:+.6f} <= 0")
+    print(f"  Face 6 (I_dot = I_max(e))  : max(dI_dot/dt) = {max_f6:+.6f} <= 0")
     assert min_f1 >= 0.0 and max_f2 < 0.0 and min_f3 >= 0.0 and max_f4 < 0.0 and min_f5 > 0.0 and max_f6 <= 0.0
 
     def poincare_event(t, y, *args):
@@ -526,7 +542,7 @@ def run_global_confinement_and_poincare_verification():
     poincare_event.direction = 1.0
 
     print("-" * 84)
-    print(f"{'Gain (e / e_c)':<16} | {'min(gamma)':<12} | {'max(gamma)':<12} | {'min(H_obs)':<12} | {'min(I_dot)':<12} | {'Observed Regime in B'}")
+    print(f"{'Gain (e / e_c)':<16} | {'min(gamma)':<12} | {'max(gamma)':<12} | {'min(H_obs)':<12} | {'min(I_dot)':<12} | {'Observed Regime in B(e)'}")
     print("-" * 84)
     sol_120 = None
     for mult in [0.90, 1.01, 1.04, 1.08, 1.20, 2.00]:
@@ -544,18 +560,50 @@ def run_global_confinement_and_poincare_verification():
         min_H = np.min(sol.y[1])
         min_I = np.min(sol.y[2])
         assert min_g > 0.0 and max_g < gamma_max and min_H > 0.0 and min_I > 0.0
-        regime = "Asymptotically stable eq." if mult < 1.0 else "Confined relaxation cycle in B"
+        regime = "Asymptotically stable eq." if mult < 1.0 else "Confined relaxation cycle in B(e)"
         print(f"{mult:>6.2f} * e_c     | {min_g:>12.6f} | {max_g:>12.6f} | {min_H:>12.6f} | {min_I:>12.6f} | {regime}")
 
-    # Multi-initial-condition Poincare return-map & transverse Floquet multiplier audit at e = 1.20 * e_c:
+    # Multi-IC Poincare return-map, independent DOP853 replication, Liouville integral & Floquet audit at e = 1.20 * e_c:
     args_120 = (a, b, c, 1.20 * e_c, f, g, E_avail, P_input, I_erase, gamma_max, H_max, eps_H, eps_I)
     t_cross_0 = sol_120.t_events[0]
     y_cross_0 = sol_120.y_events[0]
     periods_0 = np.diff(t_cross_0[-6:])
-    period_spread = np.max(periods_0) - np.min(periods_0)
-    state_spread = np.max(np.linalg.norm(np.diff(y_cross_0[-6:], axis=0), axis=1))
+    period_spread = float(np.max(periods_0) - np.min(periods_0))
+    state_spread = float(np.max(np.linalg.norm(np.diff(y_cross_0[-6:], axis=0), axis=1)))
 
-    # Test two additional widely separated initial conditions across B:
+    # Tightened LSODA integration (rtol=1e-12, atol=1e-14) for high-precision section reference:
+    sol_tight = solve_ivp(
+        upgraded_v15_ode, (0, 400), [gamma_star + 1e-4, H_star, I_star], args=args_120,
+        events=poincare_event, method="LSODA", rtol=1e-12, atol=1e-14
+    )
+    y_sec_tight = sol_tight.y_events[0][-1]
+
+    # Independent replication via explicit 8th-order Dormand-Prince Runge-Kutta (DOP853, rtol=1e-11, atol=1e-13)
+    # coupled with the exact Liouville orbital divergence integral int_0^T div F(y(t)) dt:
+    e_120 = 1.20 * e_c
+    def div_F(y):
+        gm, h_o, i_d = y
+        dHobs = c * gm * (H_max - h_o) - I_erase * np.tanh(h_o / eps_H)
+        j11 = -a * i_d * E_avail / gamma_max - b
+        j22 = -c * gm - (I_erase / eps_H) * (1.0 / np.cosh(min(h_o / eps_H, 300.0)) ** 2)
+        j33 = (e_120 / eps_I) * (1.0 / np.cosh(min(i_d / eps_I, 300.0)) ** 2) * dHobs - g
+        return j11 + j22 + j33
+
+    def aug_liouville_ode(t, z):
+        return upgraded_v15_ode(t, z[:3], *args_120) + [div_F(z[:3])]
+
+    sol_dop853 = solve_ivp(
+        aug_liouville_ode, (0.0, 42.0), list(y_sec_tight) + [0.0],
+        events=poincare_event, method="DOP853", rtol=1e-11, atol=1e-13
+    )
+    y_sec_dop = sol_dop853.y_events[0][-1, :3]
+    T_dop = float(sol_dop853.t_events[0][-1] - sol_dop853.t_events[0][-2])
+    liouville_int = float(sol_dop853.y_events[0][-1, 3] - sol_dop853.y_events[0][-2, 3])
+    log10_det_DP = liouville_int / np.log(10.0)
+    cross_solver_state_diff = float(np.linalg.norm(y_cross_0[-1] - y_sec_dop))
+    cross_solver_period_diff = float(abs(periods_0[-1] - T_dop))
+
+    # Test two additional widely separated initial conditions across B(e):
     extra_ics = [
         ("Low-entropy IC", [0.5, 10.0, 2.0]),
         ("High-rate IC", [8.0, 50.0, 40.0]),
@@ -570,51 +618,100 @@ def run_global_confinement_and_poincare_verification():
         ic_states.append(s_ic.y_events[0][-1])
         ic_periods.append(np.diff(s_ic.t_events[0][-6:])[-1])
 
-    multi_ic_state_diff = max(np.linalg.norm(ic_states[k] - ic_states[0]) for k in range(1, 3))
-    multi_ic_period_diff = max(abs(ic_periods[k] - ic_periods[0]) for k in range(1, 3))
+    multi_ic_state_diff = float(max(np.linalg.norm(ic_states[k] - ic_states[0]) for k in range(1, 3)))
+    multi_ic_period_diff = float(max(abs(ic_periods[k] - ic_periods[0]) for k in range(1, 3)))
 
-    # Compute 2x2 linearized Poincare return map Jacobian DP and transverse Floquet multipliers:
-    y_sec = y_cross_0[-1]
-    def one_poincare_return(h_val, i_val):
-        s1 = solve_ivp(upgraded_v15_ode, (0, 0.5), [1.0, h_val, i_val], args=args_120, method="LSODA", rtol=1e-9, atol=1e-12)
-        def ev_ret(t, y, *a):
-            return y[0] - 1.0
-        ev_ret.terminal = True
-        ev_ret.direction = 1.0
-        s2 = solve_ivp(upgraded_v15_ode, (0.5, 25.0), s1.y[:, -1], args=args_120, events=ev_ret, method="LSODA", rtol=1e-9, atol=1e-12)
-        return s2.y_events[0][0, 1:]
+    # Evaluate finite-difference return-map Jacobian DP at both standard (rtol=1e-9, step=1e-3)
+    # and tightened (rtol=1e-12, atol=1e-14, step=1e-2) settings to bound rho_FD(DP) below FD noise floor:
+    def eval_fd_floquet(y_base, rtol_v, atol_v, dp_step, solver="LSODA"):
+        def one_ret(h_val, i_val):
+            s1 = solve_ivp(upgraded_v15_ode, (0, 0.5), [1.0, h_val, i_val], args=args_120, method=solver, rtol=rtol_v, atol=atol_v)
+            def ev_ret(t, y, *a):
+                return y[0] - 1.0
+            ev_ret.terminal = True
+            ev_ret.direction = 1.0
+            s2 = solve_ivp(upgraded_v15_ode, (0.5, 25.0), s1.y[:, -1], args=args_120, events=ev_ret, method=solver, rtol=rtol_v, atol=atol_v)
+            return s2.y_events[0][0, 1:]
+        P_hp = one_ret(y_base[1] + dp_step, y_base[2])
+        P_hm = one_ret(y_base[1] - dp_step, y_base[2])
+        P_ip = one_ret(y_base[1], y_base[2] + dp_step)
+        P_im = one_ret(y_base[1], y_base[2] - dp_step)
+        DP = np.column_stack([(P_hp - P_hm) / (2 * dp_step), (P_ip - P_im) / (2 * dp_step)])
+        return float(np.max(np.abs(np.linalg.eigvals(DP))))
 
-    dp_step = 1e-3
-    P_hp = one_poincare_return(y_sec[1] + dp_step, y_sec[2])
-    P_hm = one_poincare_return(y_sec[1] - dp_step, y_sec[2])
-    P_ip = one_poincare_return(y_sec[1], y_sec[2] + dp_step)
-    P_im = one_poincare_return(y_sec[1], y_sec[2] - dp_step)
-    DP = np.column_stack([(P_hp - P_hm) / (2 * dp_step), (P_ip - P_im) / (2 * dp_step)])
-    floquet_eigs = np.linalg.eigvals(DP)
-    rho_floquet = float(np.max(np.abs(floquet_eigs)))
+    rho_fd_std = eval_fd_floquet(y_cross_0[-1], 1e-9, 1e-12, 1e-3, solver="LSODA")
+    rho_fd_tight = eval_fd_floquet(y_sec_tight, 1e-12, 1e-14, 1e-2, solver="LSODA")
 
     print("-" * 84)
-    print(f"Poincare Section (gamma = 1.0, dgamma/dt > 0) & Floquet Audit at e = 1.20 * e_c:")
-    print(f"  Asymptotic section fixed point   : (H_obs, I_dot) = ({y_sec[1]:.8f}, {y_sec[2]:.8f})")
-    print(f"  Asymptotic oscillation period T  : {periods_0[-1]:.8f} s (5-cycle spread = {period_spread:.2e} s; certified < 1e-6 s [2.58e-9 x86_64, 1.72e-7 ARM64])")
-    print(f"  Cycle-to-cycle state spread      : ||Delta y||_2 = {state_spread:.2e} (certified < 1e-6 [3.85e-10 x86_64, 5.57e-9 ARM64])")
-    print(f"  Multi-IC convergence (3 ICs in B): max ||Delta y_IC||_2 = {multi_ic_state_diff:.2e} (< 1e-6), max |Delta T_IC| = {multi_ic_period_diff:.2e} s (< 1e-6 s)")
-    print(f"  Transverse Floquet spectral rad. : rho(DP) = {rho_floquet:.2e} << 1 (strictly inside unit circle)")
+    print("Poincare Section (gamma = 1.0, dgamma/dt > 0), Liouville & Floquet Audit at e = 1.20 * e_c:")
+    print(f"  Asymptotic section fixed point   : (H_obs, I_dot) = ({y_sec_dop[1]:.8f}, {y_sec_dop[2]:.8f})")
+    print(f"  Asymptotic oscillation period T  : {T_dop:.8f} s (5-cycle spread = {period_spread:.2e} s, certified < 1e-6 s)")
+    print(f"  Cycle-to-cycle state spread      : ||Delta y||_2 = {state_spread:.2e} (certified < 1e-6)")
+    print(f"  Cross-solver replication (DOP853): ||y_LSODA - y_DOP853||_2 = {cross_solver_state_diff:.2e} (< 1e-6), |Delta T| = {cross_solver_period_diff:.2e} s")
+    print(f"  Multi-IC convergence (3 ICs in B): max ||Delta y_IC||_2 = {multi_ic_state_diff:.2e} (certified < 1e-6), max |Delta T_IC| = {multi_ic_period_diff:.2e} s")
+    print(f"  Liouville orbital div. integral  : int_0^T div F dt = {liouville_int:.2f} => det(DP) ~ 10^({log10_det_DP:.1f}) << 1")
+    print(f"  FD Floquet bound (rtol=1e-9,h=1e-3) : rho_FD(DP) = {rho_fd_std:.2e} < 1e-5 (at FD noise floor ~ rtol/(2h) ~ 10^-6)")
+    print(f"  FD Floquet bound (rtol=1e-12,h=1e-2): rho_FD(DP) = {rho_fd_tight:.2e} < 1e-8 (below FD resolution, strictly inside unit circle)")
     assert period_spread < 1e-6 and state_spread < 1e-6
+    assert cross_solver_state_diff < 1e-6 and cross_solver_period_diff < 1e-6
     assert multi_ic_state_diff < 1e-6 and multi_ic_period_diff < 1e-6
-    assert rho_floquet < 1e-3
+    assert liouville_int < -10400.0
+    assert rho_fd_std < 1e-5 and rho_fd_tight < 1e-8
+
+
+def strip_lean_comments(text):
+    """Strip Lean 4 block comments `/- ... -/` and line comments `-- ...` before scanning."""
+    no_block = re.sub(r"/-.*?-/", " ", text, flags=re.DOTALL)
+    no_line = re.sub(r"--[^\n]*", " ", no_block)
+    return no_line
 
 
 def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
     """
     IntentSeal Verifiable Research Kernel (VRK v0.3.1, DOI: 10.5281/zenodo.23018459;
     Lineage v0.1.1-v0.5.0 DOI: 10.5281/zenodo.23016445; Ecosystem DOI: 10.5281/zenodo.23474505)
-    epistemic type-discipline, fail-closed mutation check, and telemetry-free deterministic
-    certificate digest verification.
+    claim-schema and on-disk evidence-manifest gate (`SCHEMA_AND_MANIFEST_VALIDATED`).
     """
     print("\n" + "=" * 84)
-    print("4. INTENTSEAL VRK v0.3.1 EPISTEMIC TYPE-SYSTEM & DETERMINISTIC CERTIFICATE AUDIT")
+    print("4. INTENTSEAL VRK v0.3.1 CLAIM-SCHEMA & ON-DISK EVIDENCE-MANIFEST GATE")
     print("=" * 84)
+
+    base_dir = Path(__file__).resolve().parent
+
+    # 1. Inspect Lean 4 Lake package files and comment-stripped `BoundaryVerification.lean` on disk:
+    bv_path = base_dir / "BoundaryVerification.lean"
+    lf_path = base_dir / "lakefile.lean"
+    lm_path = base_dir / "lake-manifest.json"
+    lt_path = base_dir / "lean-toolchain"
+    assert bv_path.exists() and lf_path.exists() and lm_path.exists() and lt_path.exists(), (
+        "Missing Lean 4 Lake project files in archive directory"
+    )
+    for p_check in [bv_path, lf_path, lm_path, lt_path]:
+        raw_b = p_check.read_bytes()
+        assert not raw_b.startswith(b"\xef\xbb\xbf"), f"UTF-8 BOM detected in {p_check.name}"
+
+    lean_code_clean = strip_lean_comments(bv_path.read_text(encoding="utf-8"))
+    assert re.search(r"\bsorry\b", lean_code_clean) is None, "Forbidden `sorry` token detected in Lean code"
+    assert re.search(r"\bnlinarith\b", lean_code_clean) is None, "Forbidden `nlinarith` tactic detected in Lean code"
+    required_lean_decls = [
+        "dgamma_dt_nonneg_at_boundary",
+        "dgamma_dt_pos_at_boundary",
+        "dgamma_dt_neg_at_ceiling",
+        "dHobs_dt_nonneg_at_boundary",
+        "dHobs_dt_neg_at_ceiling",
+        "dIdot_dt_pos_at_boundary",
+        "dHobs_dt_le_M_H",
+        "dIdot_dt_nonpos_at_ceiling",
+        "compact_box_nagumo_certificate",
+    ]
+    for decl in required_lean_decls:
+        assert re.search(rf"\btheorem\s+{re.escape(decl)}\b", lean_code_clean), f"Missing Lean theorem: {decl}"
+
+    toolchain_str = lt_path.read_text(encoding="utf-8").strip()
+    manifest_obj = json.loads(lm_path.read_text(encoding="utf-8"))
+    mathlib_rev = next((p["rev"] for p in manifest_obj.get("packages", []) if p.get("name") == "mathlib"), "")
+    assert toolchain_str == "leanprover/lean4:v4.36.0-rc1"
+    assert mathlib_rev.startswith("10156080d0e7")
 
     REQUIRED_ROLES = {
         "CONJECTURE": frozenset(),
@@ -628,7 +725,7 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
         "ANALYTIC_THEOREM": frozenset({"definition", "proof", "scope_statement", "independent_verification"}),
     }
 
-    def validate_vrk_claim_v2(claim):
+    def validate_vrk_claim_v2(claim, check_disk=True):
         if claim.get("schema") != "intentseal-vrk-claim-v2":
             return False, "invalid schema"
         c_class = claim.get("claim_class")
@@ -641,80 +738,111 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
         missing = REQUIRED_ROLES[c_class] - roles_present
         if missing:
             return False, f"missing required roles for {c_class}: {sorted(missing)}"
-        return True, "VALID"
+        if check_disk:
+            for ev in claim.get("evidence", []):
+                raw_target = ev.get("path", "")
+                file_part, _, anchor_part = raw_target.partition("#")
+                f_path = base_dir / file_part
+                if not f_path.exists() or f_path.stat().st_size == 0:
+                    return False, f"missing or empty evidence file on disk: {file_part}"
+                if anchor_part:
+                    txt_content = f_path.read_text(encoding="utf-8")
+                    if anchor_part not in txt_content:
+                        return False, f"anchor '{anchor_part}' not found in {file_part}"
+        return True, "SCHEMA_AND_MANIFEST_VALIDATED"
 
     claims = [
         {
             "schema": "intentseal-vrk-claim-v2",
             "claim_id": "physics.v1_5.compact_box_nagumo_invariance",
-            "claim_text": "For all strictly positive parameters and e > 0, R^3_+ and the compact box B = [0, gamma_max] x [0, H_max] x [0, I_dot_max] are globally forward-invariant under the v1.5 soft-wall ODE flow.",
+            "claim_text": "For all strictly positive parameters and e > 0, R^3_+ and the e-dependent compact box B(e) = [0, gamma_max] x [0, H_max] x [0, I_dot_max(e)] are globally forward-invariant under the v1.5 soft-wall ODE flow.",
             "claim_class": "ANALYTIC_THEOREM",
             "sealed": True,
             "domain": {"system": "PHYSICS_V1_5_ODE", "kind": "analytic_invariance_theorem"},
             "scope": {
-                "applies_to": ["Appendix A v1.5 soft-wall ODE system Eqs. (3)-(5)", "compact box B in R^3_+"],
+                "applies_to": ["Appendix A v1.5 soft-wall ODE system Eqs. (3)-(5)", "compact box B(e) in R^3_+"],
                 "does_not_imply": ["unregularized v1.0 global positivity for e > e_c", "analytical uniqueness of post-Hopf limit cycle", "empirical quantum gravity law"],
             },
             "dependencies": [
                 {"claim_id": "physics.v1_4.analytic_hopf_positivity", "relation": "extends_additive_lineage", "claim_digest": digest_object({"doi": "10.17605/OSF.IO/U7M6H"})}
             ],
             "evidence": [
-                {"role": "definition", "path": "appendix_a_v1_5.tex"},
-                {"role": "proof", "path": "boundary_verification.lean"},
-                {"role": "scope_statement", "path": "README.md"},
-                {"role": "independent_verification", "path": "verification_patch_v1_5.py"},
+                {"role": "definition", "path": "appendix_a_v1_5.tex#thm:global_invariance"},
+                {"role": "proof", "path": "BoundaryVerification.lean#compact_box_nagumo_certificate"},
+                {"role": "scope_statement", "path": "README.md#Summary of Upgraded v1.5 Contributions"},
+                {"role": "independent_verification", "path": "verification_patch_v1_5.py#run_global_confinement_and_poincare_verification"},
             ],
         },
         {
             "schema": "intentseal-vrk-claim-v2",
-            "claim_id": "physics.v1_5.exact_equilibrium_and_two_gate_scaling",
-            "claim_text": "At steady state dH_obs/dt|_* = 0, (gamma*, I_dot*) are exact and d/dI_dot[e*tanh(I_dot/eps_I)*dH_obs/dt]|_* = 0 identically, while ||J_v1.5 - J_v1.4||_F and |Delta l1| decay exponentially with 1 - tanh(I_dot*/eps_I) and sech^2(H_obs*/eps_H).",
+            "claim_id": "physics.v1_5.exact_equilibrium_and_vanishing_gate_derivative",
+            "claim_text": "At steady state dH_obs/dt|_* = 0, (gamma*, I_dot*) are exact and d/dI_dot[e*tanh(I_dot/eps_I)*dH_obs/dt]|_* = 0 identically, with zero symbolic residual across J_v1.5, B_v1.5, C_{1,v1.5}=0, C_{2,v1.5}, C_{3,v1.5}.",
             "claim_class": "ANALYTIC_THEOREM",
             "sealed": True,
-            "domain": {"system": "PHYSICS_V1_5_ODE", "kind": "symbolic_and_high_precision_perturbation"},
+            "domain": {"system": "PHYSICS_V1_5_ODE", "kind": "symbolic_equilibrium_and_taylor_tensors"},
             "scope": {
-                "applies_to": ["interior equilibrium (gamma*, H_obs*, I_dot*)", "parametric gate sweep eps in [0.005, 0.10]"],
-                "does_not_imply": ["eps-independent identity at large eps ~ O(1)", "closed-form global l1 sign outside the v1.4 polynomial ratio"],
+                "applies_to": ["interior equilibrium (gamma*, H_obs*, I_dot*)", "1st-, 2nd-, and 3rd-order Taylor tensors at steady state"],
+                "does_not_imply": ["eps-independent H_obs* at O(1) gate widths", "closed-form global l1 sign outside the v1.4 polynomial ratio"],
             },
             "dependencies": [],
             "evidence": [
-                {"role": "definition", "path": "appendix_a_v1_5.tex"},
-                {"role": "proof", "path": "appendix_a_v1_5.tex#Proposition4"},
-                {"role": "scope_statement", "path": "README.md"},
-                {"role": "independent_verification", "path": "verification_patch_v1_5.py"},
+                {"role": "definition", "path": "appendix_a_v1_5.tex#prop:jacobian_invariance"},
+                {"role": "proof", "path": "appendix_a_v1_5.tex#eq:J_v15"},
+                {"role": "scope_statement", "path": "README.md#Six-Layer Mechanical & VRK v0.3.1 Verification Chain"},
+                {"role": "independent_verification", "path": "verification_patch_v1_5.py#verify_sympy_derivatives_against_analytic"},
+            ],
+        },
+        {
+            "schema": "intentseal-vrk-claim-v2",
+            "claim_id": "physics.v1_5.two_gate_scaling_sweep",
+            "claim_text": "Across eps_H = eps_I = eps in {0.10, 0.05, 0.02, 0.01, 0.005} on the v1.4 audit slice, ||J_v1.5 - J_v1.4||_F, |Delta e_c|, and |Delta l1| decay exponentially with 1 - tanh(I_dot*/eps_I) ~ 2*exp(-2*I_dot*/eps_I) and sech^2(H_obs*/eps_H) ~ 4*exp(-2*H_obs*/eps_H).",
+            "claim_class": "REPRODUCED_RESULT",
+            "sealed": True,
+            "domain": {"system": "PHYSICS_V1_5_ODE", "kind": "multiprecision_gate_scaling_sweep"},
+            "scope": {
+                "applies_to": ["v1.3/v1.4 audit parameter slice", "parametric gate sweep eps in [0.005, 0.10]"],
+                "does_not_imply": ["symbolic proof of l1_v1.5 > 0 at arbitrary O(1) eps without v1.4 continuity"],
+            },
+            "dependencies": [
+                {"claim_id": "physics.v1_5.exact_equilibrium_and_vanishing_gate_derivative", "relation": "quantifies_perturbation_of", "claim_digest": digest_object({"ref": "prop:jacobian_invariance"})}
+            ],
+            "evidence": [
+                {"role": "definition", "path": "appendix_a_v1_5.tex#tab:eps_sweep"},
+                {"role": "execution_record", "path": "verification_patch_v1_5.py#evaluate_v15_softwall_metrics"},
+                {"role": "independent_replication", "path": "verification_patch_v1_5.py#asymp_ec_shift"},
             ],
         },
         {
             "schema": "intentseal-vrk-claim-v2",
             "claim_id": "physics.v1_5.post_hopf_poincare_floquet_orbit",
-            "claim_text": "At e = 1.20 * e_c on the v1.1 benchmark (eps_H = eps_I = 0.05), LSODA trajectories from 3 initial conditions in B converge to an attracting periodic relaxation orbit on Sigma = {gamma = 1.0, dgamma/dt > 0} with T = 18.95704705 s (spread < 1e-6 s) and transverse Floquet spectral radius rho(DP) = 8.96e-6 << 1.",
+            "claim_text": "At e = 1.20 * e_c on the v1.1 benchmark (eps_H = eps_I = 0.05), trajectories from 3 initial conditions in B(e) converge to an attracting periodic relaxation orbit on Sigma = {gamma = 1.0, dgamma/dt > 0} with T = 18.957047 s (spread < 1e-6 s), 3-IC state spread < 1e-6, Liouville orbital divergence integral int_0^T div F dt = -10405.41 (det(DP) ~ 10^-4519 << 1), and finite-difference transverse Floquet spectral radius rho_FD(DP) < 1e-8 at (rtol=1e-12, atol=1e-14, step=1e-2) (< 1e-5 at rtol=1e-9, step=1e-3).",
             "claim_class": "REPRODUCED_RESULT",
             "sealed": True,
             "domain": {"system": "PHYSICS_V1_5_ODE", "kind": "numerical_poincare_floquet_benchmark"},
             "scope": {
-                "applies_to": ["v1.1 benchmark parameter slice at e = 1.20 * e_c", "3 tested initial conditions in B"],
+                "applies_to": ["v1.1 benchmark parameter slice at e = 1.20 * e_c", "3 tested initial conditions in B(e)"],
                 "does_not_imply": ["analytic proof of global limit-cycle uniqueness", "interval-certified Arb enclosure"],
             },
             "dependencies": [],
             "evidence": [
-                {"role": "definition", "path": "appendix_a_v1_5.tex#Table3"},
-                {"role": "execution_record", "path": "verification_patch_v1_5.py"},
-                {"role": "independent_replication", "path": "launch_sandbox.py"},
+                {"role": "definition", "path": "appendix_a_v1_5.tex#tab:confinement"},
+                {"role": "execution_record", "path": "verification_patch_v1_5.py#sol_120"},
+                {"role": "independent_replication", "path": "verification_patch_v1_5.py#sol_dop853"},
             ],
         },
     ]
 
     for c in claims:
-        ok, detail = validate_vrk_claim_v2(c)
+        ok, detail = validate_vrk_claim_v2(c, check_disk=True)
         assert ok, f"VRK claim validation failed for {c['claim_id']}: {detail}"
         c["claim_digest"] = digest_object(c)
 
     # Adversarial mutation test (VRK v0.3.1 Epistemic Type System invariant):
-    # Attempting to promote the numerical Poincare/Floquet claim to ANALYTIC_THEOREM without a formal `proof` role must be rejected.
-    mutated_claim = dict(claims[2])
+    # Attempting to promote a REPRODUCED_RESULT claim to ANALYTIC_THEOREM without a formal `proof` role must be rejected.
+    mutated_claim = dict(claims[3])
     mutated_claim["claim_class"] = "ANALYTIC_THEOREM"
-    ok_mut, detail_mut = validate_vrk_claim_v2(mutated_claim)
-    assert not ok_mut, "VRK fail-closed check failed: illegal promotion NUMERICAL/REPRODUCED -> ANALYTIC_THEOREM was not rejected!"
+    ok_mut, detail_mut = validate_vrk_claim_v2(mutated_claim, check_disk=False)
+    assert not ok_mut, "VRK fail-closed check failed: illegal promotion REPRODUCED_RESULT -> ANALYTIC_THEOREM was not rejected!"
 
     # Build telemetry-free deterministic certificate (intentseal-vrk-deterministic-certificate-v2):
     det_cert = {
@@ -729,45 +857,31 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
             for c in claims
         ],
         "sympy_equilibrium_and_tensor_residual_zero": True,
-        "lean4_six_face_compact_box_certificate": "compact_box_nagumo_certificate (0 sorry, 0 nlinarith)",
+        "lean4_six_face_compact_box_certificate": "BoundaryVerification.lean#compact_box_nagumo_certificate (0 sorry, 0 nlinarith)",
+        "lean4_module_sha256": hashlib.sha256(bv_path.read_bytes()).hexdigest(),
+        "lake_manifest_sha256": hashlib.sha256(lm_path.read_bytes()).hexdigest(),
+        "lean_toolchain": toolchain_str,
         "kuznetsov_l1_v14_50digit": "0.51958911735122026898339319478059794000845983604843",
         "eps_scaling_sweep": sweep_records,
         "poincare_floquet_gates": {
             "six_face_nagumo_grid_pass": True,
-            "period_T_sec": "18.95704705",
+            "period_T_sec": "18.957047",
             "period_spread_lt_1e_6": True,
             "state_spread_lt_1e_6": True,
+            "cross_solver_lsoda_dop853_lt_1e_6": True,
             "multi_ic_3_convergence_lt_1e_6": True,
-            "transverse_floquet_rho_lt_1e_3": True,
+            "liouville_div_integral_lt_minus_10400": True,
+            "transverse_floquet_rho_fd_tight_lt_1e_8": True,
+            "transverse_floquet_rho_fd_std_lt_1e_5": True,
         },
         "adversarial_promotion_mutation_rejected": True,
     }
     cert_digest = digest_object(det_cert)
 
-    import os
-    from pathlib import Path
-    base_dir = Path(__file__).resolve().parent
-    bv_upper = base_dir / "BoundaryVerification.lean"
-    bv_lower = base_dir / "boundary_verification.lean"
-    lf_path = base_dir / "lakefile.lean"
-    lm_path = base_dir / "lake-manifest.json"
-    lt_path = base_dir / "lean-toolchain"
-    if bv_upper.exists() and bv_lower.exists() and lf_path.exists() and lm_path.exists() and lt_path.exists():
-        b_up = bv_upper.read_bytes()
-        b_lo = bv_lower.read_bytes()
-        assert b_up == b_lo, "BoundaryVerification.lean and boundary_verification.lean must be byte-identical"
-        assert not b_up.startswith(b"\xef\xbb\xbf"), "UTF-8 BOM detected in Lean module"
-        assert not lf_path.read_bytes().startswith(b"\xef\xbb\xbf"), "UTF-8 BOM detected in lakefile.lean"
-        lean_text = b_up.decode("utf-8")
-        assert "sorry" not in [tok.strip(".,:;()`") for tok in lean_text.split() if tok == "sorry"], "sorry found"
-        toolchain_str = lt_path.read_text(encoding="utf-8").strip()
-        manifest_obj = json.loads(lm_path.read_text(encoding="utf-8"))
-        mathlib_rev = next((p["rev"] for p in manifest_obj.get("packages", []) if p.get("name") == "mathlib"), "")
-        print(f"Lean 4 Lake Build Manifest Audit : PASSED ({toolchain_str}, mathlib@{mathlib_rev[:12]})")
-
+    print(f"Lean 4 Lake Manifest & AST Scan  : VALIDATED ({toolchain_str}, mathlib@{mathlib_rev[:12]}, 9/9 theorems, 0 sorry/nlinarith)")
     print(f"VRK v0.3.1 Trust Root Anchor     : {det_cert['vrk_verifier_trust_root_digest']}")
-    print(f"VRK Schema & Role Check (3/3)    : PASSED (ANALYTIC_THEOREM x2, REPRODUCED_RESULT x1)")
-    print(f"Adversarial Cast Mutation Gate   : REJECTED ({detail_mut})")
+    print("VRK Claim & On-Disk Manifest (4) : SCHEMA_AND_MANIFEST_VALIDATED (ANALYTIC_THEOREM x2, REPRODUCED_RESULT x2)")
+    print(f"Adversarial Cast Mutation Gate   : REJECTED (REPRODUCED_RESULT -> ANALYTIC_THEOREM: {detail_mut})")
     print(f"Deterministic Certificate Digest : {cert_digest}")
     print("=" * 84)
     print("STATUS: ALL 60/750-DIGIT SPECTRAL, SYMPY, SCALING, NAGUMO, FLOQUET & VRK CHECKS PASSED")
