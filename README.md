@@ -3,6 +3,8 @@
 
 **Rights boundary — effective 1 October 2026:** New author-owned original material first published here from this date is **All Rights Reserved** by default.
 
+I maintain this repository as the release map for Appendix A. The linked OSF and Zenodo records identify the citable versions; the v1.4 line remains frozen while v1.5 is the active release.
+
 ## October 2026 Update: Appendix A v1.5 Release
 * **Gate 0 Closed:** Baseline independence loophole resolved via Ryu-Takayanagi relation.
 * **Global Boundary Confinement:** Multiplicative soft-wall filters stabilize the subcritical Hopf bifurcation engine.
