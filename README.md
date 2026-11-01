@@ -1,4 +1,12 @@
-﻿# Physics v1.0 — Dynamical Sector
+<p align="center"><a href="https://github.com/reggaesharkk/Reggae-shark-universe-"><img src="https://raw.githubusercontent.com/reggaesharkk/Reggae-shark-universe-/main/assets/universe_bar.svg" alt="Reggae Shark Universe — public research map" width="100%" /></a></p>
+
+<p align="center"><a href="https://github.com/reggaesharkk/Reggae-shark-universe-">Public research map</a> &nbsp;·&nbsp; <a href="https://github.com/reggaesharkk?tab=repositories">All public repositories</a> &nbsp;·&nbsp; <a href="https://orcid.org/0009-0002-1170-4487">ORCID</a></p>
+
+> I keep each project’s evidence, scope, and open questions alongside the work.
+
+---
+
+# Physics v1.0 — Dynamical Sector
 *(For the full document text and archival details, see OSF record DOI 10.17605/OSF.IO/TSW4B and Appendix A v1.4 DOI 10.17605/OSF.IO/U7M6H).*
 
 **Rights boundary — effective 1 October 2026:** New author-owned original material first published here from this date is **All Rights Reserved** by default.
