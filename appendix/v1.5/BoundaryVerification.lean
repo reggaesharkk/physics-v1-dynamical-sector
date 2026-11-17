@@ -46,6 +46,24 @@ def M_H (c gamma_max H_max I_erase : ℝ) : ℝ :=
 def I_dot_max (e f g P_input c gamma_max H_max I_erase : ℝ) : ℝ :=
   (e * M_H c gamma_max H_max I_erase + f * P_input) / g
 
+/-- Positivity / non-negativity of the auxiliary box bounds `M_H` and `I_dot_max`. -/
+theorem M_H_nonneg
+    (c gamma_max H_max I_erase : ℝ)
+    (hc : 0 ≤ c) (hgmax : 0 ≤ gamma_max) (hHmax : 0 ≤ H_max) (hIe : 0 ≤ I_erase) :
+    0 ≤ M_H c gamma_max H_max I_erase := by
+  unfold M_H
+  exact add_nonneg (mul_nonneg (mul_nonneg hc hgmax) hHmax) hIe
+
+theorem I_dot_max_pos
+    (e f g P_input c gamma_max H_max I_erase : ℝ)
+    (he : 0 ≤ e) (hf : 0 < f) (hg : 0 < g) (hP : 0 < P_input)
+    (hc : 0 ≤ c) (hgmax : 0 ≤ gamma_max) (hHmax : 0 ≤ H_max) (hIe : 0 ≤ I_erase) :
+    0 < I_dot_max e f g P_input c gamma_max H_max I_erase := by
+  unfold I_dot_max
+  have hMH : 0 ≤ M_H c gamma_max H_max I_erase :=
+    M_H_nonneg c gamma_max H_max I_erase hc hgmax hHmax hIe
+  exact div_pos (add_pos_of_nonneg_of_pos (mul_nonneg he hMH) (mul_pos hf hP)) hg
+
 /-- Unified vector field `F : CosmologicalState → CosmologicalState`. -/
 def F (a b c e f g gamma_max H_max E_avail P_input I_erase epsH epsI : ℝ)
     (s : CosmologicalState) : CosmologicalState :=
@@ -213,8 +231,7 @@ theorem compact_box_nagumo_certificate
     (a b c e f g gamma_max H_max E_avail P_input I_erase epsH epsI : ℝ)
     (ha : 0 ≤ a) (hb : 0 < b) (hc : 0 ≤ c) (he : 0 ≤ e) (hf : 0 < f) (hg : 0 < g)
     (hgmax : 0 < gamma_max) (hHmax : 0 < H_max) (hE : 0 ≤ E_avail) (hP : 0 < P_input)
-    (hIe : 0 < I_erase) (htanh_Hmax : 0 < Real.tanh (H_max / epsH))
-    (hMH : 0 ≤ M_H c gamma_max H_max I_erase) :
+    (hIe : 0 < I_erase) (htanh_Hmax : 0 < Real.tanh (H_max / epsH)) :
     -- Face 1: Lower γ-boundary (γ = 0)
     (∀ s : CosmologicalState, s.gamma = 0 → 0 ≤ s.I_dot →
       0 ≤ (F a b c e f g gamma_max H_max E_avail P_input I_erase epsH epsI s).gamma) ∧
@@ -237,6 +254,8 @@ theorem compact_box_nagumo_certificate
       0 ≤ Real.tanh (s.I_dot / epsI) →
       Real.tanh (s.I_dot / epsI) ≤ 1 →
       (F a b c e f g gamma_max H_max E_avail P_input I_erase epsH epsI s).I_dot ≤ 0) := by
+  have hMH : 0 ≤ M_H c gamma_max H_max I_erase :=
+    M_H_nonneg c gamma_max H_max I_erase hc (le_of_lt hgmax) (le_of_lt hHmax) (le_of_lt hIe)
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro s hgamma hI
     exact dgamma_dt_nonneg_at_boundary a b E_avail gamma_max ha hE s hgamma hI

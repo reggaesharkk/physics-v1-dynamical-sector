@@ -231,6 +231,16 @@ def verify_sympy_derivatives_against_analytic():
     assert sp.simplify(f2.subs(sub_full_eq)) == 0
     assert sp.simplify(f3.subs(sub_full_eq)) == 0
 
+    # Check 0b: Equilibrium existence & uniqueness on (0, H_max):
+    # g(0) = c*gamma*H_max > 0, g(H_max) = -I_erase*tanh(H_max/eps_H) < 0,
+    # and dg/dH_obs = -c*gamma - (I_erase/eps_H)*sech^2(H_obs/eps_H) < 0 strictly.
+    f2_at_0 = sp.simplify(f2.subs({H_obs: 0}))
+    f2_at_Hmax = sp.simplify(f2.subs({H_obs: H_max}))
+    df2_dH = sp.simplify(sp.diff(f2, H_obs))
+    assert f2_at_0 == c * gamma * H_max
+    assert f2_at_Hmax == -I_erase * sp.tanh(H_max / eps_H)
+    assert sp.simplify(df2_dH - (-c * gamma - (I_erase / eps_H) * (1 - sp.tanh(H_obs / eps_H) ** 2))) == 0
+
     sub_eq = {H_max: H_obs + I_erase * sp.tanh(H_obs / eps_H) / (c * gamma)}
 
     # Check 1: At equilibrium f2 == 0, verify df3/dI_dot == -g identically:
@@ -642,6 +652,39 @@ def run_global_confinement_and_poincare_verification():
     rho_fd_std = eval_fd_floquet(y_cross_0[-1], 1e-9, 1e-12, 1e-3, solver="LSODA")
     rho_fd_tight = eval_fd_floquet(y_sec_tight, 1e-12, 1e-14, 1e-2, solver="LSODA")
 
+    # Exact 3x3 variational monodromy integration dPhi/dt = DF(y(t)) * Phi, Phi(0) = I_3 over [0, T_dop]
+    # Eliminates finite-difference truncation/solver noise floor and verifies trivial multiplier mu_0 == 1.
+    def jacobian_v15_num(y):
+        gm, h_o, i_d = y
+        sech2_h = 1.0 / np.cosh(min(h_o / eps_H, 300.0)) ** 2
+        tanh_i = np.tanh(i_d / eps_I)
+        sech2_i = 1.0 / np.cosh(min(i_d / eps_I, 300.0)) ** 2
+        dHobs = c * gm * (H_max - h_o) - I_erase * np.tanh(h_o / eps_H)
+        j21 = c * (H_max - h_o)
+        j22 = -c * gm - (I_erase / eps_H) * sech2_h
+        return np.array([
+            [-a * i_d * E_avail / gamma_max - b, 0.0, a * E_avail * (1.0 - gm / gamma_max)],
+            [j21, j22, 0.0],
+            [e_120 * tanh_i * j21, e_120 * tanh_i * j22, (e_120 / eps_I) * sech2_i * dHobs - g],
+        ])
+
+    def variational_ode(t, z):
+        y_cur = z[:3]
+        Phi = z[3:].reshape((3, 3))
+        dy = upgraded_v15_ode(t, y_cur, *args_120)
+        dPhi = jacobian_v15_num(y_cur) @ Phi
+        return dy + dPhi.ravel().tolist()
+
+    z0_var = list(y_sec_dop) + np.eye(3).ravel().tolist()
+    sol_var = solve_ivp(
+        variational_ode, (0.0, T_dop), z0_var,
+        method="DOP853", rtol=1e-12, atol=1e-14
+    )
+    M_monodromy = sol_var.y[3:, -1].reshape((3, 3))
+    floquet_eigs = np.sort(np.abs(np.linalg.eigvals(M_monodromy)))[::-1]
+    mu_trivial = float(floquet_eigs[0])
+    rho_var_transverse = float(floquet_eigs[1])
+
     print("-" * 84)
     print("Poincare Section (gamma = 1.0, dgamma/dt > 0), Liouville & Floquet Audit at e = 1.20 * e_c:")
     print(f"  Asymptotic section fixed point   : (H_obs, I_dot) = ({y_sec_dop[1]:.8f}, {y_sec_dop[2]:.8f})")
@@ -652,11 +695,13 @@ def run_global_confinement_and_poincare_verification():
     print(f"  Liouville orbital div. integral  : int_0^T div F dt = {liouville_int:.2f} => det(DP) ~ 10^({log10_det_DP:.1f}) << 1")
     print(f"  FD Floquet bound (rtol=1e-9,h=1e-3) : rho_FD(DP) = {rho_fd_std:.2e} (Informational Noise Floor) (at FD noise floor ~ rtol/(2h) ~ 10^-6)")
     print(f"  FD Floquet bound (rtol=1e-12,h=1e-2): rho_FD(DP) = {rho_fd_tight:.2e} < 1e-8 (below FD resolution, strictly inside unit circle)")
+    print(f"  Variational Monodromy M(T) (DOP853)  : |mu_0| = {mu_trivial:.8f} (trivial ~ 1), max |mu_trans| = {rho_var_transverse:.2e} << 1")
     assert period_spread < 1e-6 and state_spread < 1e-6
     assert cross_solver_state_diff < 1e-6 and cross_solver_period_diff < 1e-6
     assert multi_ic_state_diff < 1e-6 and multi_ic_period_diff < 1e-6
     assert liouville_int < -10400.0
     assert rho_fd_std < 2e-5 and rho_fd_tight < 1e-8
+    assert abs(mu_trivial - 1.0) < 1e-6 and rho_var_transverse < 1e-8
 
 
 def strip_lean_comments(text):
@@ -702,6 +747,8 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
         "dIdot_dt_pos_at_boundary",
         "dHobs_dt_le_M_H",
         "dIdot_dt_nonpos_at_ceiling",
+        "M_H_nonneg",
+        "I_dot_max_pos",
         "compact_box_nagumo_certificate",
     ]
     for decl in required_lean_decls:
@@ -873,12 +920,14 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
             "liouville_div_integral_lt_minus_10400": True,
             "transverse_floquet_rho_fd_tight_lt_1e_8": True,
             "transverse_floquet_rho_fd_std_lt_1e_5": True,
+            "variational_monodromy_trivial_mu_eq_1": True,
+            "variational_monodromy_transverse_lt_1e_8": True,
         },
         "adversarial_promotion_mutation_rejected": True,
     }
     cert_digest = digest_object(det_cert)
 
-    print(f"Lean 4 Lake Manifest & Text Search Scan  : VALIDATED ({toolchain_str}, mathlib@{mathlib_rev[:12]}, 9/9 theorems, 0 sorry/nlinarith)")
+    print(f"Lean 4 Lake Manifest & Text Search Scan  : VALIDATED ({toolchain_str}, mathlib@{mathlib_rev[:12]}, 11/11 theorems, 0 sorry/nlinarith)")
     print(f"VRK v0.3.1 Trust Root Anchor     : {det_cert['vrk_verifier_trust_root_digest']}")
     print("VRK Claim & On-Disk Manifest (4) : SCHEMA_AND_MANIFEST_VALIDATED (ANALYTIC_THEOREM x2, REPRODUCED_RESULT x2)")
     print(f"Adversarial Cast Mutation Gate   : REJECTED (REPRODUCED_RESULT -> ANALYTIC_THEOREM: {detail_mut})")
