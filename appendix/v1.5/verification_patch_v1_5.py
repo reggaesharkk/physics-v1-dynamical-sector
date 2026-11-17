@@ -27,15 +27,16 @@ This script performs six non-hardcoded verification layers:
    six faces of the e-dependent compact trapping box B(e) = [0, gamma_max] x [0, H_max] x [0, I_max(e)]
    and post-Hopf trajectory confinement across e / e_c in {0.90, 1.01, 1.04, 1.08, 1.20, 2.00}
    on the v1.1 benchmark parameter set.
-5. Multi-initial-condition Poincare section return-map, cross-solver replication (LSODA Adams/BDF
-   vs. DOP853 8th-order Runge-Kutta), Liouville orbital divergence integral, and transverse Floquet
-   multiplier verification at e = 1.20 * e_c:
+5. Multi-initial-condition Poincare section return-map and cross-solver replication (LSODA Adams/BDF
+   vs. DOP853 8th-order Runge-Kutta) at e = 1.20 * e_c. Liouville and Floquet calculations are
+   numerical diagnostics; the double-precision transverse multipliers are not resolved reliably:
    - Asymptotic section point : (H_obs, I_dot)_Sigma = (3.910830, 21.683927), period T = 18.957047 s
    - Cross-solver replication : ||y_LSODA - y_DOP853||_2 < 10^-6, |T_LSODA - T_DOP853| < 10^-6 s
    - 3-IC convergence in B(e) : max ||Delta y_IC||_2 < 10^-6 (< 10^-9 at rtol=10^-12), max |Delta T_IC| < 10^-6 s
    - Liouville orbital integral: int_0^T div F(y(t)) dt = -10405.41 => det(DP) = exp(-10405.41) ~ 10^-4519 << 1
-   - Finite-diff Floquet bound: rho_FD(DP) < 10^-8 at (rtol=10^-12, atol=10^-14, step=10^-2), below the
-     finite-difference truncation noise floor (~ rtol / (2*step) ~ 10^-6 at rtol=10^-9, step=10^-3).
+   - Liouville estimate det(DP) ~ 10^-4519 is far below float64 range; the raw transverse
+     eigenvalue near machine precision and finite-difference values are unresolved diagnostics,
+     not certified contraction bounds. No Floquet stability claim is made from these values.
 6. IntentSeal Verifiable Research Kernel (VRK v0.3.1, DOI: 10.5281/zenodo.23018459; Lineage
    DOI: 10.5281/zenodo.23016445; Ecosystem DOI: 10.5281/zenodo.23474505) claim-schema and
    on-disk evidence-manifest gate (`SCHEMA_AND_MANIFEST_VALIDATED`), verifying 4 separated claims
@@ -504,7 +505,7 @@ def upgraded_v15_ode(t, y, a, b, c, e, f, g, E_avail, P_input, I_erase, gamma_ma
 
 def run_global_confinement_and_poincare_verification():
     print("\n" + "=" * 84)
-    print("3. 6-FACE NAGUMO BOX CHECK, POST-HOPF CONFINEMENT, MULTI-IC POINCARE & FLOQUET")
+    print("3. 6-FACE BOUNDARY CHECK, POST-HOPF CONFINEMENT, MULTI-IC POINCARE & FLOQUET DIAGNOSTICS")
     print("=" * 84)
     a = b = c = f = g = E_avail = 1.0
     gamma_max, H_max, P_input, I_erase = 10.0, 100.0, 5.0, 10.0
@@ -631,8 +632,8 @@ def run_global_confinement_and_poincare_verification():
     multi_ic_state_diff = float(max(np.linalg.norm(ic_states[k] - ic_states[0]) for k in range(1, 3)))
     multi_ic_period_diff = float(max(abs(ic_periods[k] - ic_periods[0]) for k in range(1, 3)))
 
-    # Evaluate finite-difference return-map Jacobian DP at both standard (rtol=1e-9, step=1e-3)
-    # and tightened (rtol=1e-12, atol=1e-14, step=1e-2) settings to bound rho_FD(DP) below FD noise floor:
+    # Evaluate the finite-difference return-map Jacobian DP under two settings as a diagnostic.
+    # Values below the numerical resolution are not interpreted as Floquet bounds.
     def eval_fd_floquet(y_base, rtol_v, atol_v, dp_step, solver="LSODA"):
         def one_ret(h_val, i_val):
             s1 = solve_ivp(upgraded_v15_ode, (0, 0.5), [1.0, h_val, i_val], args=args_120, method=solver, rtol=rtol_v, atol=atol_v)
@@ -652,8 +653,8 @@ def run_global_confinement_and_poincare_verification():
     rho_fd_std = eval_fd_floquet(y_cross_0[-1], 1e-9, 1e-12, 1e-3, solver="LSODA")
     rho_fd_tight = eval_fd_floquet(y_sec_tight, 1e-12, 1e-14, 1e-2, solver="LSODA")
 
-    # Exact 3x3 variational monodromy integration dPhi/dt = DF(y(t)) * Phi, Phi(0) = I_3 over [0, T_dop]
-    # Eliminates finite-difference truncation/solver noise floor and verifies trivial multiplier mu_0 == 1.
+    # Numerically integrate the 3x3 variational equation in float64. This removes finite-difference
+    # truncation but does not remove roundoff or conditioning limits in the resulting eigensystem.
     def jacobian_v15_num(y):
         gm, h_o, i_d = y
         sech2_h = 1.0 / np.cosh(min(h_o / eps_H, 300.0)) ** 2
@@ -681,27 +682,27 @@ def run_global_confinement_and_poincare_verification():
         method="DOP853", rtol=1e-12, atol=1e-14
     )
     M_monodromy = sol_var.y[3:, -1].reshape((3, 3))
-    floquet_eigs = np.sort(np.abs(np.linalg.eigvals(M_monodromy)))[::-1]
-    mu_trivial = float(floquet_eigs[0])
-    rho_var_transverse = float(floquet_eigs[1])
+    floquet_eigs = np.linalg.eigvals(M_monodromy)
+    trivial_idx = int(np.argmin(np.abs(floquet_eigs - 1.0)))
+    mu_trivial = float(abs(floquet_eigs[trivial_idx]))
+    raw_transverse = np.delete(np.abs(floquet_eigs), trivial_idx)
 
     print("-" * 84)
-    print("Poincare Section (gamma = 1.0, dgamma/dt > 0), Liouville & Floquet Audit at e = 1.20 * e_c:")
+    print("Poincare Section (gamma = 1.0, dgamma/dt > 0), Liouville & Floquet Diagnostics at e = 1.20 * e_c:")
     print(f"  Asymptotic section fixed point   : (H_obs, I_dot) = ({y_sec_dop[1]:.8f}, {y_sec_dop[2]:.8f})")
-    print(f"  Asymptotic oscillation period T  : {T_dop:.8f} s (5-cycle spread = {period_spread:.2e} s, certified < 1e-6 s)")
-    print(f"  Cycle-to-cycle state spread      : ||Delta y||_2 = {state_spread:.2e} (certified < 1e-6)")
+    print(f"  Asymptotic oscillation period T  : {T_dop:.8f} s (5-cycle spread = {period_spread:.2e} s, checked < 1e-6 s)")
+    print(f"  Cycle-to-cycle state spread      : ||Delta y||_2 = {state_spread:.2e} (checked < 1e-6)")
     print(f"  Cross-solver replication (DOP853): ||y_LSODA - y_DOP853||_2 = {cross_solver_state_diff:.2e} (< 1e-6), |Delta T| = {cross_solver_period_diff:.2e} s")
-    print(f"  Multi-IC convergence (3 ICs in B): max ||Delta y_IC||_2 = {multi_ic_state_diff:.2e} (certified < 1e-6), max |Delta T_IC| = {multi_ic_period_diff:.2e} s")
+    print(f"  Multi-IC convergence (3 ICs in B): max ||Delta y_IC||_2 = {multi_ic_state_diff:.2e} (checked < 1e-6), max |Delta T_IC| = {multi_ic_period_diff:.2e} s")
     print(f"  Liouville orbital div. integral  : int_0^T div F dt = {liouville_int:.2f} => det(DP) ~ 10^({log10_det_DP:.1f}) << 1")
-    print(f"  FD Floquet bound (rtol=1e-9,h=1e-3) : rho_FD(DP) = {rho_fd_std:.2e} (Informational Noise Floor) (at FD noise floor ~ rtol/(2h) ~ 10^-6)")
-    print(f"  FD Floquet bound (rtol=1e-12,h=1e-2): rho_FD(DP) = {rho_fd_tight:.2e} < 1e-8 (below FD resolution, strictly inside unit circle)")
-    print(f"  Variational Monodromy M(T) (DOP853)  : |mu_0| = {mu_trivial:.8f} (trivial ~ 1), max |mu_trans| = {rho_var_transverse:.2e} << 1")
+    print(f"  FD return-map diagnostics            : rho estimates = ({rho_fd_std:.2e}, {rho_fd_tight:.2e}); not certified bounds")
+    print(f"  Variational monodromy (float64)      : nearest |mu| to 1 = {mu_trivial:.8f}; raw transverse magnitudes = {raw_transverse}; unresolved, not bounds")
     assert period_spread < 1e-6 and state_spread < 1e-6
     assert cross_solver_state_diff < 1e-6 and cross_solver_period_diff < 1e-6
     assert multi_ic_state_diff < 1e-6 and multi_ic_period_diff < 1e-6
     assert liouville_int < -10400.0
-    assert rho_fd_std < 2e-5 and rho_fd_tight < 1e-8
-    assert abs(mu_trivial - 1.0) < 1e-6 and rho_var_transverse < 1e-8
+    assert np.isfinite(rho_fd_std) and np.isfinite(rho_fd_tight)
+    assert abs(mu_trivial - 1.0) < 1e-6
 
 
 def strip_lean_comments(text):
@@ -802,20 +803,21 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
         {
             "schema": "intentseal-vrk-claim-v2",
             "claim_id": "physics.v1_5.compact_box_nagumo_invariance",
-            "claim_text": "For all strictly positive parameters and e > 0, R^3_+ and the e-dependent compact box B(e) = [0, gamma_max] x [0, H_max] x [0, I_dot_max(e)] are globally forward-invariant under the v1.5 soft-wall ODE flow.",
+            "claim_text": "For all strictly positive parameters and e > 0, the v1.5 soft-wall ODE flow leaves R^3_+ and B(e) = [0, gamma_max] x [0, H_max] x [0, I_dot_max(e)] forward-invariant, by the analytic proof in Appendix A applying Nagumo's theorem to the six boundary inequalities. Lean checks those boundary inequalities; it does not formalize Nagumo's theorem or the ODE-flow conclusion.",
             "claim_class": "ANALYTIC_THEOREM",
             "sealed": True,
             "domain": {"system": "PHYSICS_V1_5_ODE", "kind": "analytic_invariance_theorem"},
             "scope": {
                 "applies_to": ["Appendix A v1.5 soft-wall ODE system Eqs. (3)-(5)", "compact box B(e) in R^3_+"],
-                "does_not_imply": ["unregularized v1.0 global positivity for e > e_c", "analytical uniqueness of post-Hopf limit cycle", "empirical quantum gravity law"],
+                "does_not_imply": ["unregularized v1.0 global positivity for e > e_c", "Lean formalization of Nagumo's theorem or ODE-flow invariance", "analytical uniqueness of post-Hopf limit cycle", "empirical quantum gravity law"],
             },
             "dependencies": [
                 {"claim_id": "physics.v1_4.analytic_hopf_positivity", "relation": "extends_additive_lineage", "claim_digest": digest_object({"doi": "10.17605/OSF.IO/U7M6H"})}
             ],
             "evidence": [
                 {"role": "definition", "path": "appendix_a_v1_5.tex#thm:global_invariance"},
-                {"role": "proof", "path": "BoundaryVerification.lean#compact_box_nagumo_certificate"},
+                {"role": "proof", "path": "appendix_a_v1_5.tex#thm:global_invariance"},
+                {"role": "formal_boundary_certificate", "path": "BoundaryVerification.lean#compact_box_nagumo_certificate"},
                 {"role": "scope_statement", "path": "README.md#Summary of Upgraded v1.5 Contributions"},
                 {"role": "independent_verification", "path": "verification_patch_v1_5.py#run_global_confinement_and_poincare_verification"},
             ],
@@ -861,14 +863,14 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
         },
         {
             "schema": "intentseal-vrk-claim-v2",
-            "claim_id": "physics.v1_5.post_hopf_poincare_floquet_orbit",
-            "claim_text": "At e = 1.20 * e_c on the v1.1 benchmark (eps_H = eps_I = 0.05), trajectories from 3 initial conditions in B(e) converge to an attracting periodic relaxation orbit on Sigma = {gamma = 1.0, dgamma/dt > 0} with T = 18.957047 s (spread < 1e-6 s), 3-IC state spread < 1e-6, Liouville orbital divergence integral int_0^T div F dt = -10405.41 (det(DP) ~ 10^-4519 << 1), and finite-difference transverse Floquet spectral radius rho_FD(DP) < 1e-8 at (rtol=1e-12, atol=1e-14, step=1e-2) (< 1e-5 at rtol=1e-9, step=1e-3).",
+            "claim_id": "physics.v1_5.post_hopf_poincare_orbit_observation",
+            "claim_text": "At e = 1.20 * e_c on the v1.1 benchmark (eps_H = eps_I = 0.05), trajectories from 3 tested initial conditions approached a numerically periodic relaxation oscillation on Sigma = {gamma = 1.0, dgamma/dt > 0}, with T = 18.957047 s (spread < 1e-6 s) and state spread < 1e-6. The Liouville calculation estimates det(DP) ~ 10^-4519. The float64 variational matrix gives a raw transverse eigenvalue near machine precision (~2.66e-16), unresolved at this scale; finite-difference values have no certified error enclosure. These are diagnostics, not certified transverse contraction or stability bounds; the observed convergence is empirical for the tested runs.",
             "claim_class": "REPRODUCED_RESULT",
             "sealed": True,
-            "domain": {"system": "PHYSICS_V1_5_ODE", "kind": "numerical_poincare_floquet_benchmark"},
+            "domain": {"system": "PHYSICS_V1_5_ODE", "kind": "numerical_poincare_orbit_observation"},
             "scope": {
                 "applies_to": ["v1.1 benchmark parameter slice at e = 1.20 * e_c", "3 tested initial conditions in B(e)"],
-                "does_not_imply": ["analytic proof of global limit-cycle uniqueness", "interval-certified Arb enclosure"],
+                "does_not_imply": ["analytic proof of global limit-cycle uniqueness", "certified transverse Floquet stability", "interval-certified Arb enclosure"],
             },
             "dependencies": [],
             "evidence": [
@@ -918,10 +920,9 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
             "cross_solver_lsoda_dop853_lt_1e_6": True,
             "multi_ic_3_convergence_lt_1e_6": True,
             "liouville_div_integral_lt_minus_10400": True,
-            "transverse_floquet_rho_fd_tight_lt_1e_8": True,
-            "transverse_floquet_rho_fd_std_lt_1e_5": True,
             "variational_monodromy_trivial_mu_eq_1": True,
-            "variational_monodromy_transverse_lt_1e_8": True,
+            "transverse_floquet_status": "UNRESOLVED_FLOAT64_DYNAMIC_RANGE",
+            "finite_difference_floquet_status": "DIAGNOSTIC_ONLY_NOT_A_CERTIFIED_BOUND",
         },
         "adversarial_promotion_mutation_rejected": True,
     }
@@ -933,7 +934,7 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
     print(f"Adversarial Cast Mutation Gate   : REJECTED (REPRODUCED_RESULT -> ANALYTIC_THEOREM: {detail_mut})")
     print(f"Deterministic Certificate Digest : {cert_digest}")
     print("=" * 84)
-    print("STATUS: ALL 60/750-DIGIT SPECTRAL, SYMPY, SCALING, NAGUMO, FLOQUET & VRK CHECKS PASSED")
+    print("STATUS: 60/750-DIGIT, SYMPY, SCALING, BOUNDARY-CERTIFICATE & VRK CHECKS PASSED; FLOQUET STABILITY UNRESOLVED")
     print("=" * 84)
 
 
