@@ -12,10 +12,14 @@ This Lean 4 module (`BoundaryVerification.lean`, verified via
 formalizes the upgraded soft-wall dynamical vector field
 `F = (dgamma_dt, dHobs_dt, dIdot_dt)` of Appendix A v1.5 and provides complete,
 machine-checked proofs (with zero `sorry` axioms and zero `nlinarith` heuristics)
-of the Nagumo subtangentiality (inward-pointing vector field) conditions across
+of the six boundary inequalities used as Nagumo subtangentiality conditions across
 all three lower faces of the positive orthant `ℝ³₊ = {s | 0 ≤ s.gamma ∧ 0 ≤ s.H_obs ∧ 0 ≤ s.I_dot}`
 AND all three upper ceiling faces (`gamma = gamma_max`, `H_obs = H_max`, `I_dot = I_dot_max`)
 of the compact trapping box `B = [0, gamma_max] × [0, H_max] × [0, I_dot_max]`.
+
+This module checks the algebraic boundary premises. The analytic application of Nagumo's theorem
+and the resulting ODE-flow invariance conclusion are proved in the manuscript and are not
+formalized in Lean here.
 -/
 
 noncomputable section
@@ -223,8 +227,8 @@ theorem dIdot_dt_nonpos_at_ceiling
     mul_assoc e (Real.tanh (s.I_dot / epsI)) (dHobs_dt c H_max I_erase epsH s)
   linarith
 
-/-- Theorem 7 (Complete 6-Face Compact-Box Nagumo Invariance Certificate):
-Simultaneous formal verification of all six boundary face conditions (three lower
+/-- Theorem 7 (Six-Face Compact-Box Boundary Certificate):
+Simultaneous formal verification of all six boundary face inequalities (three lower
 orthant faces and three upper ceiling faces) of the compact trapping box
 `B = [0, gamma_max] × [0, H_max] × [0, I_dot_max]`. -/
 theorem compact_box_nagumo_certificate
