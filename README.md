@@ -13,14 +13,27 @@
 
 I maintain this repository as the release map for Appendix A. The linked OSF and Zenodo records identify the citable versions; the v1.4 line remains frozen while v1.5 is the active release.
 
-## October 2026 Update: Appendix A v1.5 Release
-* **Gate 0 Closed:** Baseline independence loophole resolved via Ryu-Takayanagi relation.
-* **Global Boundary Confinement:** Multiplicative soft-wall filters stabilize the subcritical Hopf bifurcation engine.
-* **Lean 4 Formal Verification Kernel:** Added computer-checked proof certifying positive orthant forward invariance.
-* **Citable Archive DOI (v1.5-Lean):** https://doi.org/10.5281/zenodo.23501526
+## Appendix A v1.5
 
-## Repository navigation
-* appendix/v1.5/ — Active release containing typeset manuscript, .lean proof kernels, and verification tools
-* appendix/v1.4/ — Frozen theorem release
-* analysis/ — Dynamical-sector analysis code
+| Result | Scope and evidence |
+| --- | --- |
+| Gate 0 (Proposition 1) | The entropy ceiling is related to extremal-surface area under the holographic dictionary assumed in the manuscript. Gate 0 remains open for non-geometric factorizations. [Read the manuscript](appendix/v1.5/Physics_v1_5_Appendix_A.pdf). |
+| Boundary confinement (Theorem 3) | The [Lean certificate](appendix/v1.5/BoundaryVerification.lean) establishes the vector-field inequalities on all six faces of the gain-dependent box. The manuscript uses those inequalities to establish forward invariance. |
+| Post-Hopf oscillation | The [Python verification suite](appendix/v1.5/verification_patch_v1_5.py) examines attraction numerically using return maps and Floquet calculations for the reported parameter choices. |
 
+Cite the [archived v1.5 Lean release](https://doi.org/10.5281/zenodo.23501526).
+
+## Reproduce the checks
+
+From the repository root, with Python 3.11 and elan installed:
+
+```bash
+cd appendix/v1.5
+lake exe cache get
+lake build BoundaryVerification
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python verification_patch_v1_5.py
+```
+
+The [v1.5 release guide](appendix/v1.5/README.md) lists the six verification layers, expected numerical results, and SHA-256 checksums. Earlier work is available in the [frozen v1.4 theorem release](appendix/v1.4/) and the [analysis directory](analysis/).
