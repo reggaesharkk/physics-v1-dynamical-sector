@@ -29,7 +29,7 @@
 | **3. 60-Digit Spectral** | `mpmath` 60-digit (`verification_patch_v1_5.py`) | `REPRODUCED_RESULT` | $e_c = 135/26$, $\omega_c = \sqrt{2/13}$, and $l_{1,\text{v1.4}}$ verified against 50-digit reference ($|\Delta| = 9.38 \times 10^{-52}$) | Section 6 / Table 1 (v1.4 Baseline) |
 | **4. 750/1450-Digit Sweep** | `mpmath` 750/1450-digit (`verification_patch_v1_5.py`) | `REPRODUCED_RESULT` | Two-gate scales at $\epsilon = 0.01$ and 5-point exponential convergence sweep across $\epsilon \in [0.005, 0.10]$ cross-checked against asymptotic $2e^{-2\dot{I}^*/\epsilon_I}$ | Proposition 4(3) / Tables 1–2 |
 | **5. Return Map, Liouville & Variational Floquet** | `SciPy` `LSODA` & `DOP853` (`verification_patch_v1_5.py`) | `REPRODUCED_RESULT` | 6-face grid check, post-Hopf confinement ($e/e_c \in [0.9, 2.0]$), `LSODA`/`DOP853` replication ($\|\Delta y\|_2 < 10^{-6}$), 3-IC Poincaré convergence ($\max\|\Delta y_{\text{IC}}\|_2 < 10^{-6}$), period $T = 18.957047\text{ s}$ (spread $< 10^{-6}\text{ s}$), Liouville integral $\int_0^T \operatorname{div} F\,dt = -10405.41$ ($\det(DP) \approx 10^{-4519} \ll 1$), exact variational monodromy ($|\mu_0| = 1.00000000$, $\max|\mu_{\text{trans}}| = 2.66 \times 10^{-16}$), and $\rho_{\text{FD}}(DP) < 10^{-8}$ at $\text{rtol}=10^{-12}, \Delta h = 10^{-2}$ | Section 6 / Table 3 (Attracting Orbit) |
-| **6. VRK v0.3.1 Schema & Manifest Gate** | `verification_patch_v1_5.py` ([10.5281/zenodo.23018459](https://doi.org/10.5281/zenodo.23018459)) | `SCHEMA_AND_MANIFEST_VALIDATED` | Validates 4 separated `intentseal-vrk-claim-v2` claims (`ANALYTIC_THEOREM` x2, `REPRODUCED_RESULT` x2) and on-disk file/anchor presence, rejects illegal `REPRODUCED_RESULT -> ANALYTIC_THEOREM` promotion, and binds `BoundaryVerification.lean` SHA-256 into deterministic certificate digest `a20826a8c8b3e06702277511cb0ccb57ee707e8b9cb90e70711168b2343ed866` | Section 1 & Section 6 (VRK Provenance) |
+| **6. VRK v0.3.1 Schema & Manifest Gate** | `verification_patch_v1_5.py` ([10.5281/zenodo.23018459](https://doi.org/10.5281/zenodo.23018459)) | `SCHEMA_AND_MANIFEST_VALIDATED` | Validates 4 separated `intentseal-vrk-claim-v2` claims (`ANALYTIC_THEOREM` x2, `REPRODUCED_RESULT` x2) and on-disk file/anchor presence, rejects illegal `REPRODUCED_RESULT -> ANALYTIC_THEOREM` promotion, and binds `BoundaryVerification.lean` SHA-256 into deterministic certificate digest `abb1ee2ffffd5a07f49d06343cad500b80b0ff87690c69bfdb7738145bac8113` | Section 1 & Section 6 (VRK Provenance) |
 
 ## Bundle Inventory & Reproducibility
 
@@ -62,16 +62,10 @@ python3 verification_patch_v1_5.py
 python3 launch_sandbox.py
 ```
 
+## Repository verification update
+
+The archived manuscript records certificate `a20826a8c8b3e06702277511cb0ccb57ee707e8b9cb90e70711168b2343ed866`. The repository verifier corrects the standard finite-difference certificate field to match its existing threshold of `2e-5`. The tight threshold remains `1e-8`. The verifier also checks solver completion, required section crossings, the reported period, and all six bounds on the sampled trajectories.
+
 ## SHA-256 Checksum Manifest
 
-| File | SHA-256 |
-| :--- | :--- |
-| `Physics_v1_5_Appendix_A.pdf` | `1fe5e9e21e753114677a7b5be109b18e8830488b77d9eeffa72de4d8529e509b` |
-| `appendix_a_v1_5.tex` | `576f9c82fe6eff9a698be9aee6b8ebaf0e2e89af2383b588db6d12f0c1841c15` |
-| `BoundaryVerification.lean` | `b516587d036330ea702a534fd61ebdbe6c1afb88c7d3a5596bc0a4081b7ae52b` |
-| `lakefile.lean` | `d8fa0f64b9a781c9e6b811a6d5f0ba872d9f6cfba573c43238b54b45f3cfce8c` |
-| `lake-manifest.json` | `54ca7b4da4159237d9913c799616276a775c8ee97a4aa5b1edfc67bb923739b7` |
-| `lean-toolchain` | `964acf49a540b2fbb4d25edc186eb68236afd8020473dfad7ccb08dc6ffa1d66` |
-| `verification_patch_v1_5.py` | `6a068954d0f3c6b5798466ce9d13a38633ae8e23e40bf7c18a1445a19d8a8fe3` |
-| `launch_sandbox.py` | `ab044a634a20805a6b5bd97b15f32fde7dfac84d100c38623de20f02cd908f07` |
-| `requirements.txt` | `9af84be3bb66b3ad7cfface4fbc876788d44532e7e75713ba4cb1d3fc5483f5a` |
+From this directory, run `sha256sum --check --strict SHA256SUMS` to verify all nine files against the [repository manifest](SHA256SUMS).

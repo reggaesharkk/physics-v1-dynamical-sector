@@ -53,6 +53,19 @@ import sympy as sp
 from scipy.integrate import solve_ivp
 
 
+if not __debug__:
+    raise RuntimeError("Verification requires assertions. Run Python without optimization.")
+
+
+def integrate(*args, required_events=0, **kwargs):
+    result = solve_ivp(*args, **kwargs)
+    if not result.success:
+        raise RuntimeError(f"Integration failed at t={result.t[-1]}: {result.message}")
+    if required_events and len(result.t_events[0]) < required_events:
+        raise RuntimeError(f"Expected at least {required_events} section crossings")
+    return result
+
+
 def canonical_json_bytes(value):
     """VRK v0.3.1 canonical JSON serializer (DOI: 10.5281/zenodo.23018459)."""
     return json.dumps(
@@ -552,17 +565,17 @@ def run_global_confinement_and_poincare_verification():
     poincare_event.direction = 1.0
 
     print("-" * 84)
-    print(f"{'Gain (e / e_c)':<16} | {'min(gamma)':<12} | {'max(gamma)':<12} | {'min(H_obs)':<12} | {'min(I_dot)':<12} | {'Observed Regime in B(e)'}")
+    print(f"{'Gain (e / e_c)':<16} | {'min(gamma)':<12} | {'max(gamma)':<12} | {'min(H_obs)':<12} | {'min(I_dot)':<12} | {'Sampled confinement'}")
     print("-" * 84)
     sol_120 = None
     for mult in [0.90, 1.01, 1.04, 1.08, 1.20, 2.00]:
         e_val = mult * e_c
         y0 = [gamma_star + 1e-4, H_star, I_star]
         ev = poincare_event if mult == 1.20 else None
-        sol = solve_ivp(
+        sol = integrate(
             upgraded_v15_ode, (0, 400), y0,
             args=(a, b, c, e_val, f, g, E_avail, P_input, I_erase, gamma_max, H_max, eps_H, eps_I),
-            events=ev, method="LSODA", rtol=1e-9, atol=1e-12
+            events=ev, required_events=6 if ev else 0, method="LSODA", rtol=1e-9, atol=1e-12
         )
         if mult == 1.20:
             sol_120 = sol
@@ -570,7 +583,9 @@ def run_global_confinement_and_poincare_verification():
         min_H = np.min(sol.y[1])
         min_I = np.min(sol.y[2])
         assert min_g > 0.0 and max_g < gamma_max and min_H > 0.0 and min_I > 0.0
-        regime = "Asymptotically stable eq." if mult < 1.0 else "Confined relaxation cycle in B(e)"
+        assert np.max(sol.y[1]) <= H_max
+        assert np.max(sol.y[2]) <= (e_val * M_H_val + f * P_input) / g
+        regime = "All sampled states inside B(e)"
         print(f"{mult:>6.2f} * e_c     | {min_g:>12.6f} | {max_g:>12.6f} | {min_H:>12.6f} | {min_I:>12.6f} | {regime}")
 
     # Multi-IC Poincare return-map, independent DOP853 replication, Liouville integral & Floquet audit at e = 1.20 * e_c:
@@ -582,9 +597,9 @@ def run_global_confinement_and_poincare_verification():
     state_spread = float(np.max(np.linalg.norm(np.diff(y_cross_0[-6:], axis=0), axis=1)))
 
     # Tightened LSODA integration (rtol=1e-12, atol=1e-14) for high-precision section reference:
-    sol_tight = solve_ivp(
+    sol_tight = integrate(
         upgraded_v15_ode, (0, 400), [gamma_star + 1e-4, H_star, I_star], args=args_120,
-        events=poincare_event, method="LSODA", rtol=1e-12, atol=1e-14
+        events=poincare_event, required_events=1, method="LSODA", rtol=1e-12, atol=1e-14
     )
     y_sec_tight = sol_tight.y_events[0][-1]
 
@@ -602,9 +617,9 @@ def run_global_confinement_and_poincare_verification():
     def aug_liouville_ode(t, z):
         return upgraded_v15_ode(t, z[:3], *args_120) + [div_F(z[:3])]
 
-    sol_dop853 = solve_ivp(
+    sol_dop853 = integrate(
         aug_liouville_ode, (0.0, 42.0), list(y_sec_tight) + [0.0],
-        events=poincare_event, method="DOP853", rtol=1e-11, atol=1e-13
+        events=poincare_event, required_events=2, method="DOP853", rtol=1e-11, atol=1e-13
     )
     y_sec_dop = sol_dop853.y_events[0][-1, :3]
     T_dop = float(sol_dop853.t_events[0][-1] - sol_dop853.t_events[0][-2])
@@ -621,9 +636,9 @@ def run_global_confinement_and_poincare_verification():
     ic_states = [y_cross_0[-1]]
     ic_periods = [periods_0[-1]]
     for _, y_init in extra_ics:
-        s_ic = solve_ivp(
+        s_ic = integrate(
             upgraded_v15_ode, (0, 400), y_init, args=args_120,
-            events=poincare_event, method="LSODA", rtol=1e-9, atol=1e-12
+            events=poincare_event, required_events=2, method="LSODA", rtol=1e-9, atol=1e-12
         )
         ic_states.append(s_ic.y_events[0][-1])
         ic_periods.append(np.diff(s_ic.t_events[0][-6:])[-1])
@@ -635,12 +650,12 @@ def run_global_confinement_and_poincare_verification():
     # and tightened (rtol=1e-12, atol=1e-14, step=1e-2) settings to bound rho_FD(DP) below FD noise floor:
     def eval_fd_floquet(y_base, rtol_v, atol_v, dp_step, solver="LSODA"):
         def one_ret(h_val, i_val):
-            s1 = solve_ivp(upgraded_v15_ode, (0, 0.5), [1.0, h_val, i_val], args=args_120, method=solver, rtol=rtol_v, atol=atol_v)
+            s1 = integrate(upgraded_v15_ode, (0, 0.5), [1.0, h_val, i_val], args=args_120, method=solver, rtol=rtol_v, atol=atol_v)
             def ev_ret(t, y, *a):
                 return y[0] - 1.0
             ev_ret.terminal = True
             ev_ret.direction = 1.0
-            s2 = solve_ivp(upgraded_v15_ode, (0.5, 25.0), s1.y[:, -1], args=args_120, events=ev_ret, method=solver, rtol=rtol_v, atol=atol_v)
+            s2 = integrate(upgraded_v15_ode, (0.5, 25.0), s1.y[:, -1], args=args_120, events=ev_ret, required_events=1, method=solver, rtol=rtol_v, atol=atol_v)
             return s2.y_events[0][0, 1:]
         P_hp = one_ret(y_base[1] + dp_step, y_base[2])
         P_hm = one_ret(y_base[1] - dp_step, y_base[2])
@@ -676,7 +691,7 @@ def run_global_confinement_and_poincare_verification():
         return dy + dPhi.ravel().tolist()
 
     z0_var = list(y_sec_dop) + np.eye(3).ravel().tolist()
-    sol_var = solve_ivp(
+    sol_var = integrate(
         variational_ode, (0.0, T_dop), z0_var,
         method="DOP853", rtol=1e-12, atol=1e-14
     )
@@ -696,6 +711,7 @@ def run_global_confinement_and_poincare_verification():
     print(f"  FD Floquet bound (rtol=1e-9,h=1e-3) : rho_FD(DP) = {rho_fd_std:.2e} (Informational Noise Floor) (at FD noise floor ~ rtol/(2h) ~ 10^-6)")
     print(f"  FD Floquet bound (rtol=1e-12,h=1e-2): rho_FD(DP) = {rho_fd_tight:.2e} < 1e-8 (below FD resolution, strictly inside unit circle)")
     print(f"  Variational Monodromy M(T) (DOP853)  : |mu_0| = {mu_trivial:.8f} (trivial ~ 1), max |mu_trans| = {rho_var_transverse:.2e} << 1")
+    assert f"{T_dop:.6f}" == "18.957047", "Certificate period differs from measured period"
     assert period_spread < 1e-6 and state_spread < 1e-6
     assert cross_solver_state_diff < 1e-6 and cross_solver_period_diff < 1e-6
     assert multi_ic_state_diff < 1e-6 and multi_ic_period_diff < 1e-6
@@ -919,7 +935,7 @@ def run_vrk_v031_epistemic_and_canonical_digest_audit(sweep_records):
             "multi_ic_3_convergence_lt_1e_6": True,
             "liouville_div_integral_lt_minus_10400": True,
             "transverse_floquet_rho_fd_tight_lt_1e_8": True,
-            "transverse_floquet_rho_fd_std_lt_1e_5": True,
+            "transverse_floquet_rho_fd_std_lt_2e_5": True,
             "variational_monodromy_trivial_mu_eq_1": True,
             "variational_monodromy_transverse_lt_1e_8": True,
         },

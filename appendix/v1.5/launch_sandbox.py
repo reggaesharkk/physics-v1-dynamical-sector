@@ -8,7 +8,7 @@ v1.5 global compact-box confinement in the post-Hopf regime (e = 1.20 * e_c).
 import json
 import sys
 import webbrowser
-from http.server import SimpleHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler
 from socketserver import TCPServer
 from threading import Timer
 import numpy as np
@@ -44,17 +44,23 @@ def simulate_post_hopf(e_mult=1.20):
         args=(e_val, BENCHMARK["eps_H"], BENCHMARK["eps_I"]),
         t_eval=t_eval, method="LSODA", rtol=1e-9, atol=1e-12
     )
+    if not sol.success:
+        raise RuntimeError(sol.message)
     return sol
 
 
-class DashboardHandler(SimpleHTTPRequestHandler):
+class DashboardHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/":
+            try:
+                sol = simulate_post_hopf(1.20)
+            except RuntimeError as error:
+                self.send_error(500, explain=str(error))
+                return
             self.send_response(200)
             self.send_header("Content-type", "text/html; charset=utf-8")
             self.end_headers()
 
-            sol = simulate_post_hopf(1.20)
             t_json = json.dumps(np.round(sol.t, 4).tolist())
             g_json = json.dumps(np.round(sol.y[0], 5).tolist())
             h_json = json.dumps(np.round(sol.y[1], 5).tolist())
@@ -120,9 +126,9 @@ def open_browser():
 
 if __name__ == "__main__":
     print("Launching Appendix A v1.5 Sandbox Server on http://localhost:8080/")
-    Timer(1.0, open_browser).start()
     TCPServer.allow_reuse_address = True
-    with TCPServer(("", 8080), DashboardHandler) as server:
+    with TCPServer(("127.0.0.1", 8080), DashboardHandler) as server:
+        Timer(1.0, open_browser).start()
         try:
             server.serve_forever()
         except KeyboardInterrupt:
